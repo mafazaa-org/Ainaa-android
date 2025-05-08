@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name" translatable="false">أحمني</string>
+    <string name="title_activity_settings">الإعدادات</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">الرسائل</string>
+    <string name="sync_header">المزامنة</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">توقيعك</string>
+    <string name="reply_title">إجراء الرد الافتراضي</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">مزامنة البريد الإلكتروني بشكل دوري</string>
+    <string name="attachment_title">تحميل المرفقات الواردة</string>
+    <string name="attachment_summary_on">تحميل المرفقات تلقائيًا للبريد الوارد</string>
+
+    <!-- VPN Notifications -->
+    <string name="notification_channel_name">إشعارات الحماية</string>
+    <string name="notification_channel_desc">تنبيهات حول حالة VPN والحماية</string>
+    <string name="vpn_notification_title">VPN نشط</string>
+    <string name="vpn_notification_content">اتصالك محمي عبر VPN</string>
+    <string name="protection_active">الحماية مفعلة</string>
+    <string name="protection_inactive">الحماية غير مفعلة</string>
+    <string name="start_protection">ابدأ الحماية</string>
+    <string name="cannot_disable_message">لا يمكن إيقاف الحماية حاليًا</string>
+
+    <string name="blocking_malicious_sites">جاري حظر المواقع الضارة تلقائياً</string>
+    <string name="uptime">مدة التشغيل:</string>
+    <string name="loading_tip">جاري تحميل النصيحة...</string>
+    <string name="blocked_threats">تهديدات محظورة</string>
+    <string name="protected_devices">أجهزة محمية</string>
+    <string name="protection_features">ميزات الحماية</string>
+    <string name="permanent_protection">حماية دائمة لا يمكن إيقافها</string>
+    <string name="auto_protection">حماية تلقائية</string>
+    <string name="porn_blocking">حذر الاباحية</string>
+
+</resources>
