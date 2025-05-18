@@ -50,8 +50,8 @@ class MyVpnService : VpnService() {
         )
 
         val notification = NotificationCompat.Builder(this, NotificationUtils.CHANNEL_ID)
-            .setContentTitle(getString(R.string.vpn_notification_title))
-            .setContentText(getString(R.string.vpn_notification_content))
+            .setContentTitle("vpn Active")
+            .setContentText("vpn_notification_content")
             .setSmallIcon(android.R.drawable.ic_lock_lock).setContentIntent(pendingIntent)
             .setOngoing(true).setPriority(NotificationCompat.PRIORITY_LOW)
             .setCategory(Notification.CATEGORY_SERVICE)

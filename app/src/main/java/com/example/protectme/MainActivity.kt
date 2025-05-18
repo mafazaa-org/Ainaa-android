@@ -1,6 +1,8 @@
 package com.example.protectme
 
 import android.content.Intent
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.net.VpnService
 import android.os.Bundle
 import android.os.Handler
@@ -9,7 +11,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.protectme.databinding.ActivityMainBinding
-import java.util.concurrent.TimeUnit.MILLISECONDS
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -18,14 +19,6 @@ class MainActivity : AppCompatActivity() {
 
     private val updateUptime = object : Runnable {
         override fun run() {
-            val millis = System.currentTimeMillis() - startTime
-            val uptime = String.format(
-                "%02d:%02d:%02d",
-                MILLISECONDS.toHours(millis),
-                MILLISECONDS.toMinutes(millis) % 60,
-                MILLISECONDS.toSeconds(millis) % 60)
-
-            binding.txtUptime.text = uptime
             handler.postDelayed(this, 1000)
         }
     }
@@ -35,31 +28,37 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        changeProtectGradientColor()
+
         NotificationUtils.createNotificationChannel(this)
         setupUI()
         checkVpnStatus()
     }
 
+    private fun changeProtectGradientColor() {
+        val shader = LinearGradient(
+            0f, 0f, 0f, binding.protectYourDeviceTV.textSize,
+            intArrayOf(this.getColor(R.color.green), this.getColor(R.color.black)),
+            null,
+            Shader.TileMode.CLAMP
+        )
+        binding.protectYourDeviceTV.paint.shader = shader
+    }
+
     private fun setupUI() {
-        binding.btnToggleVpn.setOnClickListener {
+        binding.activeProtectionBtn.setOnClickListener {
             if (MyVpnService.isRunning) {
-                Toast.makeText(this, R.string.cannot_disable_message, Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "cannot_disable_message", Toast.LENGTH_LONG).show()
             } else {
                 prepareVpnService()
             }
         }
-
-        binding.txtBlockedCount.text = SecurityTips.getBlockedSitesCount().toString()
-        binding.txtSecurityTip.text = SecurityTips.getDailyTip()
     }
 
     private fun checkVpnStatus() {
         if (MyVpnService.isRunning) {
             startTime = System.currentTimeMillis() - 3600000 // مثال: ساعة مضت
             handler.post(updateUptime)
-            updateProtectionUI(true)
-        } else {
-            updateProtectionUI(false)
         }
     }
 
@@ -72,22 +71,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateProtectionUI(isActive: Boolean) {
-        if (isActive) {
-            binding.txtStatusTitle.text = getString(R.string.protection_active)
-            binding.txtStatusSubtitle.text = getString(R.string.vpn_notification_content)
-            binding.btnToggleVpn.text = getString(R.string.protection_active)
-
-            // بدء حساب مدة التشغيل
-            if (startTime == 0L) startTime = System.currentTimeMillis()
-            handler.post(updateUptime)
-        } else {
-            binding.txtStatusTitle.text = getString(R.string.protection_inactive)
-            binding.txtStatusSubtitle.text = getString(R.string.start_protection)
-            binding.btnToggleVpn.text = getString(R.string.start_protection)
-            handler.removeCallbacks(updateUptime)
-        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -103,7 +86,6 @@ class MainActivity : AppCompatActivity() {
 
         ContextCompat.startForegroundService(this, intent)
         MyVpnService.isRunning = true
-        updateProtectionUI(true)
     }
 
     override fun onDestroy() {
