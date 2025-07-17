@@ -5,12 +5,13 @@
     <color name="card_bg_dark">#0F0A3C</color>
     <color name="light_gray">#DDDDDD</color>
     <color name="gold">#FFFFD700</color>
-    <color name="red_light">#FFFF6B6B</color>
+    <color name="red_light">#FFF0EE</color>
     <color name="green_light">#FF6BCB77</color>
     <color name="blue_light">#FF6B8CFF</color>
     <color name="green">#106064</color>
     <color name="black">#000000</color>
-    <color name="gray">#575757</color>
+    <color name="gray">#7B7B7B</color>
     <color name="white">#FFFFFF</color>
     <color name="tint_logo">#11106064</color>
+    <color name="red">#E0462D</color>
 </resources>

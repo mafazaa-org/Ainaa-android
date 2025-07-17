@@ -1,23 +1,21 @@
 package com.example.protectme
 
-import android.content.Intent
-import android.graphics.LinearGradient
-import android.graphics.Shader
-import android.net.VpnService
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.example.protectme.databinding.ActivityMainBinding
+import android.content.*
+import android.graphics.*
+import android.net.*
+import android.os.*
+import android.widget.*
+import androidx.appcompat.app.*
+import androidx.core.content.*
+import com.example.protectme.databinding.*
+import com.example.protectme.ui.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity: AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val handler = Handler(Looper.getMainLooper())
     private var startTime = 0L
 
-    private val updateUptime = object : Runnable {
+    private val updateUptime = object: Runnable {
         override fun run() {
             handler.postDelayed(this, 1000)
         }
@@ -47,11 +45,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupUI() {
         binding.activeProtectionBtn.setOnClickListener {
-            if (MyVpnService.isRunning) {
-                Toast.makeText(this, "cannot_disable_message", Toast.LENGTH_LONG).show()
-            } else {
-                prepareVpnService()
-            }
+            CustomConfirmDialog(
+                this,
+                dialogType = DialogType.enableProtection,
+                onConfirm = {
+                    if (MyVpnService.isRunning) {
+                        Toast.makeText(this, "already_running_message", Toast.LENGTH_LONG).show()
+                    } else {
+                        prepareVpnService()
+                    }
+                },
+                onCancel = {}
+            ).show()
         }
     }
 
@@ -59,6 +64,7 @@ class MainActivity : AppCompatActivity() {
         if (MyVpnService.isRunning) {
             startTime = System.currentTimeMillis() - 3600000 // مثال: ساعة مضت
             handler.post(updateUptime)
+            startActivity(Intent(this, SuccessActivity::class.java))
         }
     }
 
@@ -86,6 +92,7 @@ class MainActivity : AppCompatActivity() {
 
         ContextCompat.startForegroundService(this, intent)
         MyVpnService.isRunning = true
+        startActivity(Intent(this, SuccessActivity::class.java))
     }
 
     override fun onDestroy() {

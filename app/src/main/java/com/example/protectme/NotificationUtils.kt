@@ -1,10 +1,8 @@
 package com.example.protectme
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
-import android.os.Build
+import android.app.*
+import android.content.*
+import android.os.*
 
 object NotificationUtils {
     const val CHANNEL_ID = "vpn_protection_channel"

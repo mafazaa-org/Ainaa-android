@@ -1,13 +1,12 @@
 package com.example.protectme
 
-import android.app.Notification
-import android.app.PendingIntent
-import android.content.Intent
-import android.net.VpnService
-import android.os.ParcelFileDescriptor
-import androidx.core.app.NotificationCompat
+import android.app.*
+import android.content.*
+import android.net.*
+import android.os.*
+import androidx.core.app.*
 
-class MyVpnService : VpnService() {
+class MyVpnService: VpnService() {
     private var vpnInterface: ParcelFileDescriptor? = null
 
     companion object {
@@ -18,6 +17,7 @@ class MyVpnService : VpnService() {
 
     override fun onCreate() {
         super.onCreate()
+
         createNotification()
     }
 
