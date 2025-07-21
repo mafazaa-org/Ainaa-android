@@ -1,9 +1,9 @@
-package com.example.protectme
+package com.mafazaa.ainaa
 
 
 import android.os.*
 import android.view.*
-import com.example.protectme.databinding.*
+import com.mafazaa.ainaa.databinding.*
 import com.google.android.material.bottomsheet.*
 
 class ReportProblemDialog: BottomSheetDialogFragment() {

@@ -17,12 +17,6 @@
         android:lineSpacingExtra="4sp"
         android:text="ادعمنا"
         android:textColor="@color/red" />
-    <!--
-    Font family: Almarai
-    Line height: 15sp
-    (identical to box height)
-    translationY compensates for the line height adjustment of text
-    -->
 
     <ImageView
         android:layout_width="100dp"

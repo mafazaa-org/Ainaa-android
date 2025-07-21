@@ -1,4 +1,4 @@
-package com.example.protectme
+package com.mafazaa.ainaa
 
 import android.content.*
 import android.graphics.*
@@ -7,11 +7,10 @@ import android.os.*
 import android.widget.*
 import androidx.appcompat.app.*
 import androidx.core.content.*
-import com.example.protectme.databinding.*
-import com.example.protectme.ui.*
+import com.mafazaa.ainaa.databinding.*
+import com.mafazaa.ainaa.ui.*
 
 class MainActivity: AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
     private val handler = Handler(Looper.getMainLooper())
     private var startTime = 0L
 
@@ -23,42 +22,42 @@ class MainActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    //    binding = ActivityMainBinding.inflate(layoutInflater)
+    //    setContentView(binding.root)
 
-        changeProtectGradientColor()
+       // changeProtectGradientColor()
 
         NotificationUtils.createNotificationChannel(this)
-        setupUI()
+  //      setupUI()
         checkVpnStatus()
     }
 
-    private fun changeProtectGradientColor() {
-        val shader = LinearGradient(
-            0f, 0f, 0f, binding.protectYourDeviceTV.textSize,
-            intArrayOf(this.getColor(R.color.green), this.getColor(R.color.black)),
-            null,
-            Shader.TileMode.CLAMP
-        )
-        binding.protectYourDeviceTV.paint.shader = shader
-    }
+//    private fun changeProtectGradientColor() {
+//        val shader = LinearGradient(
+//            0f, 0f, 0f, binding.protectYourDeviceTV.textSize,
+//            intArrayOf(this.getColor(R.color.green), this.getColor(R.color.black)),
+//            null,
+//            Shader.TileMode.CLAMP
+//        )
+//        binding.protectYourDeviceTV.paint.shader = shader
+//    }
 
-    private fun setupUI() {
-        binding.activeProtectionBtn.setOnClickListener {
-            CustomConfirmDialog(
-                this,
-                dialogType = DialogType.enableProtection,
-                onConfirm = {
-                    if (MyVpnService.isRunning) {
-                        Toast.makeText(this, "already_running_message", Toast.LENGTH_LONG).show()
-                    } else {
-                        prepareVpnService()
-                    }
-                },
-                onCancel = {}
-            ).show()
-        }
-    }
+//    private fun setupUI() {
+//        binding.activeProtectionBtn.setOnClickListener {
+//            CustomConfirmDialog(
+//                this,
+//                dialogType = DialogType.enableProtection,
+//                onConfirm = {
+//                    if (MyVpnService.isRunning) {
+//                        Toast.makeText(this, "already_running_message", Toast.LENGTH_LONG).show()
+//                    } else {
+//                        prepareVpnService()
+//                    }
+//                },
+//                onCancel = {}
+//            ).show()
+//        }
+//    }
 
     private fun checkVpnStatus() {
         if (MyVpnService.isRunning) {

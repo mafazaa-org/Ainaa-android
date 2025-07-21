@@ -1,4 +1,4 @@
-package com.example.protectme
+package com.mafazaa.ainaa
 
 import android.content.*
 import android.os.*
@@ -6,8 +6,8 @@ import android.widget.*
 import androidx.activity.*
 import androidx.appcompat.app.*
 import androidx.core.view.*
-import com.example.protectme.databinding.*
-import com.example.protectme.ui.*
+import com.mafazaa.ainaa.databinding.*
+import com.mafazaa.ainaa.ui.*
 
 class SuccessActivity: AppCompatActivity() {
     private lateinit var binding: ActivitySuccessBinding
@@ -30,18 +30,18 @@ class SuccessActivity: AppCompatActivity() {
             dialog.show(supportFragmentManager, "ReportProblemDialog")
         }
         binding.blockAppBtn.setOnClickListener {
-            val dialog = CustomConfirmDialog(
-                this,
-                DialogType.block,
-                onConfirm = {
-                    // todo
-                    Toast.makeText(this, "تم حجب التطبيق بنجاح", Toast.LENGTH_SHORT).show()
-                },
-                onCancel = {
-                    // Logic for cancel action if needed
-                }
-            )
-            dialog.show()
+//            val dialog = CustomConfirmDialog(
+//                this,
+//                DialogType.block,
+//                onConfirm = {
+//                    // todo
+//                    Toast.makeText(this, "تم حجب التطبيق بنجاح", Toast.LENGTH_SHORT).show()
+//                },
+//                onCancel = {
+//                    // Logic for cancel action if needed
+//                }
+//            )
+//            dialog.show()
         }
 
 

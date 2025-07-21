@@ -1,14 +1,15 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
-    namespace = "com.example.protectme"
+    namespace = "com.mafazaa.ainaa"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.protectme"
+        applicationId = "com.mafazaa.ainaa"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -35,14 +36,28 @@ android {
     }
     buildFeatures {
         viewBinding = true
-
+        compose = true
     }
 }
 
 dependencies {
+    //compose
+    val composeBom = platform("androidx.compose:compose-bom:2024.09.02")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation("androidx.compose.runtime:runtime")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.foundation:foundation-layout")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.runtime:runtime-livedata")
+    implementation("androidx.compose.ui:ui-tooling")
+
+
+    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
 
     implementation ("com.google.android.material:material:1.6.0")
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

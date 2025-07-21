@@ -1,4 +1,4 @@
-package com.example.protectme
+package com.mafazaa.ainaa
 
 import android.content.*
 import android.os.*
@@ -6,9 +6,9 @@ import androidx.activity.*
 import androidx.appcompat.app.*
 import androidx.core.net.*
 import androidx.core.view.*
-import com.example.protectme.Constants.joinUrl
-import com.example.protectme.Constants.supportUrl
-import com.example.protectme.databinding.*
+import com.mafazaa.ainaa.Constants.joinUrl
+import com.mafazaa.ainaa.Constants.supportUrl
+import com.mafazaa.ainaa.databinding.*
 
 class SupportUsActivity: AppCompatActivity() {
     private lateinit var binding: ActivitySupportUsBinding

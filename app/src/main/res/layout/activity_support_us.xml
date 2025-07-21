@@ -6,6 +6,7 @@
     android:fitsSystemWindows="true"
     android:gravity="center"
     android:orientation="vertical"
+    android:background="@color/white"
     android:padding="16dp">
 
     <include

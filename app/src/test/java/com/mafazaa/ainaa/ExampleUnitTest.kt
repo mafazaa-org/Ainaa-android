@@ -1,4 +1,4 @@
-package com.example.protectme
+package com.mafazaa.ainaa
 
 import org.junit.Test
 

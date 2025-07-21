@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.protectme">
+    package="com.mafazaa.ainaa">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:name="com.mafazaa.ainaa.MyApp"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ProtectMe"
         tools:targetApi="31">
         <activity
-            android:name=".SupportUsActivity"
+            android:name="com.mafazaa.ainaa.SupportUsActivity"
             android:exported="false" />
         <activity
-            android:name=".SuccessActivity"
+            android:name="com.mafazaa.ainaa.SuccessActivity"
             android:exported="false" />
 
         <service
-            android:name=".MyVpnService"
+            android:name="com.mafazaa.ainaa.MyVpnService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
             android:permission="android.permission.BIND_VPN_SERVICE"
@@ -35,7 +37,7 @@
         </service>
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.mafazaa.ainaa.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
