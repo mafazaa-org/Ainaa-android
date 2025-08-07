@@ -2,24 +2,25 @@ package com.mafazaa.ainaa.ui
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
 import com.mafazaa.ainaa.R
 import com.mafazaa.ainaa.model.*
 import com.mafazaa.ainaa.toPainter
-import com.mafazaa.ainaa.ui.theme.red
+import com.mafazaa.ainaa.ui.theme.*
 
 
 @Composable
@@ -28,14 +29,18 @@ fun BlockAppDialog(
     appStates: List<AppInfo>,
     onBlockClick: (AppInfo) -> Unit,
 ) {
-    Dialog(onDismissRequest = onDismiss) {
+
+    Dialog(
+        onDismissRequest = onDismiss, properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
+    ) {
         Surface(
             shape = RoundedCornerShape(16.dp),
-            color = Color.White,
-            modifier = Modifier.fillMaxWidth()
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.fillMaxWidth(.9f)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-
+            Column(modifier = Modifier.padding(8.dp)) {
                 // Close icon and title row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -57,7 +62,9 @@ fun BlockAppDialog(
                     )
                 }
 
-                Divider(modifier = Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
 
                 Text(
                     text = "بمجرد حجب برنامج، لن تتمكن من التراجع أو إعادة تشغيله لاحقاً",
@@ -67,22 +74,29 @@ fun BlockAppDialog(
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
                 )
+                Column(
+                    modifier = Modifier
+                        .padding(8.dp)
+                ) {
+                    LazyColumn {
+                        items(appStates){app->
+                            AppBlockItem(app) { onBlockClick(app) }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                thickness = DividerDefaults.Thickness,
+                                color = DividerDefaults.color
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
 
-                appStates.forEach { app ->
-                    AppBlockItem(app, onBlockClick)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        thickness = DividerDefaults.Thickness,
-                        color = DividerDefaults.color
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
     }
-}
 
+}
 @Composable
 fun AppBlockItem(
     app: AppInfo,
@@ -99,7 +113,7 @@ fun AppBlockItem(
             onClick = { onBlockClick(app) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (app.isSelected) Color.Gray else red,
-                contentColor = Color.White
+                contentColor = MaterialTheme.colorScheme.surface
             ),
             enabled = !app.isSelected,
             shape = RoundedCornerShape(8.dp),
@@ -108,6 +122,7 @@ fun AppBlockItem(
         ) {
             Text(text = if (app.isSelected) "محجوب" else "حجب")
         }
+        Spacer(modifier = Modifier.width(8.dp))
 
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -115,10 +130,10 @@ fun AppBlockItem(
             Image(
                 painter = app.icon?.toPainter() ?: painterResource(id = R.drawable.android),
                 contentDescription = app.name,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(32.dp)
             )
             Text(
-                text = "حجب ${app.name}",
+                text = app.name,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(start = 8.dp)
             )

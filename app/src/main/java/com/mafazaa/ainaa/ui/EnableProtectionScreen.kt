@@ -1,23 +1,26 @@
 package com.mafazaa.ainaa.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
-import com.mafazaa.ainaa.*
+import com.mafazaa.ainaa.R
+import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.ui.theme.*
 
 @Composable
 fun EnableProtectionScreen(
     modifier: Modifier = Modifier,
     report: () -> Unit,
-    enableProtection: (String) -> Unit,
+    enableProtection: (ProtectionLevel, String) -> Unit,
     selectedLevel: ProtectionLevel,
-    onLevelSelected: (ProtectionLevel) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -26,10 +29,13 @@ fun EnableProtectionScreen(
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp) // optional spacing between the two
+            verticalArrangement = Arrangement.spacedBy(8.dp) // optional spacing between the two
         ) {
-            ProtectionLevelSelector(selectedLevel, onLevelSelected)
-            ProtectYourDevice(enableProtection, report)
+            var selectedLevel by remember { mutableStateOf(selectedLevel) }
+            ProtectionLevelSelector(selectedLevel, {
+                selectedLevel = it
+            })
+            ProtectYourDevice({ enableProtection(selectedLevel, it) }, report)
         }
     }
 }
@@ -43,7 +49,7 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
     ) {
         // Title and Subtitle Section
         Column(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -52,13 +58,13 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "اضغط على الزر بالأسفل لتفعيل الحماية الفورية لجهازك",
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
         }
         var phoneNumber by remember { mutableStateOf("") }
+        val isPhoneNumberValid by remember {
+            derivedStateOf {
+                phoneNumber.isNotEmpty() && phoneNumber.all { it.isDigit() }//todo
+            }
+        }
         // Phone Number Input Field
         OutlinedTextField(
             value = phoneNumber,
@@ -68,14 +74,11 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .height(56.dp),
-//            colors = TextFieldDefaults.outlinedTextFieldColors(
-//                focusedBorderColor = Color.Gray,
-//                unfocusedBorderColor = Color.Gray,
-//                textColor = Color.White,
-//                placeholderColor = Color.Gray
-//            )
-        )
+                .wrapContentHeight(),
+            isError = !isPhoneNumberValid,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+
+            )
         Spacer(Modifier.size(16.dp))
 
         // Enable Protection Button
@@ -86,9 +89,11 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
                 .padding(horizontal = 16.dp)
                 .height(56.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray,
-                contentColor = Color.Black
-            )
+                disabledContainerColor = Color.LightGray,
+                containerColor = red
+
+            ),
+            enabled = isPhoneNumberValid
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -97,7 +102,7 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
                     modifier = Modifier.size(32.dp),
                     painter = painterResource(id = R.drawable.ic_white), // Replace with your lock icon
                     contentDescription = "Lock Icon",
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.surface
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -118,5 +123,5 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
 @Preview(showBackground = true, locale = "ar")
 @Composable
 fun PreviewEnableProtectionScreen() {
-    EnableProtectionScreen(Modifier, {}, {}, ProtectionLevel.HIGH, {})
+    //EnableProtectionScreen(Modifier, {}, {}, ProtectionLevel.HIGH, )
 }

@@ -1,38 +1,36 @@
 package com.mafazaa.ainaa.ui
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
+import com.mafazaa.ainaa.model.*
 import com.mafazaa.ainaa.ui.theme.*
 
-enum class ProtectionLevel {
-    HIGH, LOW
-}
 
 @Composable
 fun ProtectionLevelSelector(
     selectedLevel: ProtectionLevel,
-    onLevelSelected: (ProtectionLevel) -> Unit
+    onLevelSelected: (ProtectionLevel) -> Unit,
 ) {
-    Column(modifier = Modifier.padding(16.dp),
-        horizontalAlignment = Alignment.Start) {
+    Column(
+        modifier = Modifier.padding(16.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
 
         Text(
             text = "اختر مستوى الحماية",
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 8.dp),
             textAlign = TextAlign.Right
         )
 
@@ -51,7 +49,14 @@ fun ProtectionLevelSelector(
         ProtectionCard(
             title = "الحماية المنخفضة",
             description = "تحجب لك فقط الأساسيات التي قد تُزعجك أو تُعدّ غير مناسبة. مع إبقاء معظم المحتوى متاحاً لتصفح أكثر حرية مثل:",
-            examples = listOf("الإباحية", "القمار", "الإعلانات", "المزاح", "الأدب غير المناسب", "المواقع العربية الغير لائقة"),
+            examples = listOf(
+                "الإباحية",
+                "القمار",
+                "الإعلانات",
+                "المزاح",
+                "الأدب غير المناسب",
+                "المواقع العربية الغير لائقة"
+            ),
             selected = selectedLevel == ProtectionLevel.LOW,
             onClick = { onLevelSelected(ProtectionLevel.LOW) }
         )
@@ -64,7 +69,7 @@ fun ProtectionCard(
     description: String,
     examples: List<String>,
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val borderColor = if (selected) red else Color.LightGray
 
@@ -72,16 +77,20 @@ fun ProtectionCard(
         modifier = Modifier
             .fillMaxWidth()
             .border(1.dp, borderColor, RoundedCornerShape(8.dp))
-            .clickable { onClick() }
-            .padding(16.dp),
-        color = Color.Black,
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onClick() }
+            .padding(8.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
         Column {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
             ) {
                 RadioButton(
                     selected = selected,
@@ -95,19 +104,20 @@ fun ProtectionCard(
                     text = title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = Color.White
                 )
             }
 
             Text(
                 text = description,
-                fontSize = 14.sp,
-                color = Color.White,
+                fontSize = 12.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 12.dp),
                 textAlign = TextAlign.Right
             )
 
             FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {

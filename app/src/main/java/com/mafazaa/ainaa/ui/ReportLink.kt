@@ -1,17 +1,14 @@
 package com.mafazaa.ainaa.ui
 
-import androidx.compose.foundation.clickable
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.sp
-import com.mafazaa.ainaa.ui.theme.red
+import androidx.compose.foundation.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.text.*
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.style.*
+import androidx.compose.ui.unit.*
+import com.mafazaa.ainaa.ui.theme.*
 
 @Composable
 fun ReportLink(modifier: Modifier = Modifier, onReportClick: () -> Unit) {

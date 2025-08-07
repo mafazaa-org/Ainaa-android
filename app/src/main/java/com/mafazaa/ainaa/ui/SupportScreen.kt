@@ -2,31 +2,28 @@ package com.mafazaa.ainaa.ui
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
-import com.mafazaa.ainaa.ui.theme.cardColor
-import com.mafazaa.ainaa.ui.theme.gray
-import com.mafazaa.ainaa.ui.theme.red
+import com.mafazaa.ainaa.ui.theme.*
 
 @Composable
 fun SupportScreen(
-    modifier: Modifier= Modifier,
+    modifier: Modifier = Modifier,
     onSupportClick: () -> Unit = {},
     onJoinClick: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
             .padding(8.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
+            .background(MaterialTheme.colorScheme.surface),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -42,7 +39,10 @@ fun SupportScreen(
 
         // Box 1: الدعم المادي
         Card(
-            colors = CardDefaults.cardColors(containerColor = cardColor),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.surface
+            ),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,7 +76,7 @@ fun SupportScreen(
         }
 
         Card(
-            colors = CardDefaults.cardColors(containerColor = cardColor),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             modifier = Modifier
                 .fillMaxWidth()

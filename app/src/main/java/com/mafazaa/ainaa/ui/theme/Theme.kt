@@ -4,20 +4,18 @@ import android.os.*
 import androidx.compose.foundation.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.*
 import androidx.compose.ui.platform.*
 
-private val DarkColorScheme = darkColorScheme(
+private val DarkColorScheme = lightColorScheme(
     primary = red,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
+    secondary = PurpleGrey40,
+    tertiary = Pink40,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = red,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    surface = Color(0xFFFFFBFE),
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -30,7 +28,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun AiAssistantComposeTheme(
+fun ProtectMeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,

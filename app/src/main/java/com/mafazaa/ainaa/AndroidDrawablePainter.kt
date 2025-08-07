@@ -89,7 +89,7 @@ class AndroidDrawablePainter(
             // Reading this ensures that we invalidate when invalidateDrawable() is called
             invalidateTick
 
-            drawable.setBounds(0, 0, size.width.toInt(), size.height.toInt())
+            drawable.setBounds(0, 0, size.width.toInt()*2, size.height.toInt()*2)
 
             canvas.withSave {
                 // Painters are responsible for scaling content to meet the canvas size

@@ -1,30 +1,30 @@
 package com.mafazaa.ainaa.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.Dialog
-import com.mafazaa.ainaa.ui.theme.red
+import androidx.compose.ui.window.*
 import com.mafazaa.ainaa.R
+import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.ui.theme.*
 
 
 @Composable
 fun ConfirmDeleteDialog(
-    appName: String = "Youtube",
+    app: AppInfo,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
+    onConfirm: (AppInfo) -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -46,7 +46,7 @@ fun ConfirmDeleteDialog(
 
                 // Title
                 Text(
-                    text = "هل انت متأكد من انك تريد مسح $appName",
+                    text = "هل انت متأكد من انك تريد مسح ${app.name}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
@@ -77,7 +77,7 @@ fun ConfirmDeleteDialog(
                     }
 
                     Button(
-                        onClick = onConfirm,
+                        onClick = { onConfirm(app) },
                         colors = ButtonDefaults.buttonColors(containerColor = red)
                     ) {
                         Text("متأكد", color = Color.White)

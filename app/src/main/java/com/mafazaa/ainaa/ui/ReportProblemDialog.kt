@@ -16,7 +16,7 @@ import androidx.compose.ui.text.style.*
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
-import com.mafazaa.ainaa.model.Report
+import com.mafazaa.ainaa.model.*
 import com.mafazaa.ainaa.ui.theme.*
 
 @Composable
@@ -31,7 +31,7 @@ fun ReportProblemDialog(
     Dialog(onDismissRequest = onClose) {
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
@@ -39,7 +39,7 @@ fun ReportProblemDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
                     .padding(20.dp)
             ) {
                 // Header with close button and title
@@ -163,6 +163,6 @@ fun ReportProblemDialog(
 fun ReportProblemDialogPreview() {
     ReportProblemDialog(
         onClose = {},
-        onSubmit = { _-> }
+        onSubmit = { _ -> }
     )
 }
