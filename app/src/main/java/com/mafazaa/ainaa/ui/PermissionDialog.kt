@@ -19,6 +19,7 @@ fun PermissionDialog(
     permissionState: PermissionState,
 ) {
 val (permissionTitle, permissionDescription) = when (permissionState) {
+    PermissionState.Notification -> "إذن الإشعارات" to "يحتاج هذا التطبيق إلى إذن الإشعارات."
     PermissionState.UsageStats -> "إذن إحصائيات الاستخدام" to "يحتاج هذا التطبيق إلى إذن إحصائيات الاستخدام لمراقبة التطبيقات التي تعمل."
     PermissionState.Overlay -> "إذن العرض فوق التطبيقات" to "يحتاج هذا التطبيق إلى إذن العرض فوق التطبيقات للظهور فوق التطبيقات الأخرى."
     PermissionState.Vpn -> "إذن VPN" to "يحتاج هذا التطبيق إلى إذن VPN لإنشاء اتصال آمن."

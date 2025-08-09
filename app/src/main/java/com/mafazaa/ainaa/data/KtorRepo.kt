@@ -1,6 +1,6 @@
 package com.mafazaa.ainaa.data
 
-import android.util.Log
+import com.mafazaa.ainaa.Constants
 import com.mafazaa.ainaa.model.*
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
@@ -9,6 +9,8 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json.Default.parseToJsonElement
 
 class KtorRepo: RemoteRepo {
 
@@ -21,8 +23,31 @@ class KtorRepo: RemoteRepo {
             level = LogLevel.BODY
         }
     }
-
-
+    val latestVersionUrl =
+        "https://api.github.com/repos/mafazaa-org/Ainaa-android/releases/latest"
+    suspend fun getLatest(): Version? {
+        return try {
+            val client = HttpClient(Android)
+            val response: HttpResponse =
+                client.get(latestVersionUrl) {
+                    header("Accept", "application/vnd.github+json")
+                    header("X-GitHub-Api-Version", "2022-11-28")
+                }
+            val json = parseToJsonElement(response.bodyAsText()).jsonObject
+            val tagName = json["tag_name"]?.jsonPrimitive?.content.orEmpty()
+            val name = json["name"]?.jsonPrimitive?.content.orEmpty()
+            val body = json["body"]?.jsonPrimitive?.content.orEmpty()
+            val assets = json["assets"]?.jsonArray.orEmpty()
+            val downloadUrl = assets
+                .mapNotNull { it.jsonObject }
+                .firstOrNull { it["name"]?.jsonPrimitive?.content == Constants.releaseName }
+                ?.get("browser_download_url")?.jsonPrimitive?.content.orEmpty()
+            return Version(tagName, name, downloadUrl, body)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
     override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<SubmitResult> = flow {
         emit(SubmitResult.Loading)
         try {
@@ -67,13 +92,14 @@ class KtorRepo: RemoteRepo {
 }
 
 suspend fun main() {
-    // Example usage
     val repo = KtorRepo()
-    repo.submitPhoneNumberToGoogleForm("01234567890").collect {
-        print(it.toString())
+    print(repo.getLatest())
 
-    }
-
-    // Call the function with a sample phone number
-    // repo.submitPhoneNumberToGoogleForm("01234567890")
 }
+
+data class Version(
+    val tagName: String,
+    val name: String,
+    val downloadUrl: String,
+    val body: String
+)

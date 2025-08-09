@@ -54,6 +54,7 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
         ) {
             Text(
                 text = "قم بحماية جهازك الآن",
+                color = Color.Black,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
             )
@@ -123,5 +124,5 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
 @Preview(showBackground = true, locale = "ar")
 @Composable
 fun PreviewEnableProtectionScreen() {
-    //EnableProtectionScreen(Modifier, {}, {}, ProtectionLevel.HIGH, )
+    EnableProtectionScreen(Modifier, {}, {_,_->}, ProtectionLevel.HIGH, )
 }

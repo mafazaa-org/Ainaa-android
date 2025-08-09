@@ -9,7 +9,6 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.mafazaa.ainaa.Constants
 import com.mafazaa.ainaa.MainActivity
-import com.mafazaa.ainaa.NotificationUtils
 import com.mafazaa.ainaa.model.ProtectionLevel
 
 class MyVpnService: VpnService() {
@@ -25,8 +24,8 @@ class MyVpnService: VpnService() {
 
     override fun onCreate() {
         super.onCreate()
-
-        createNotification()
+        MyNotificationManager.createNotificationChannel(this)
+        MyNotificationManager.startForegroundService(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -50,26 +49,6 @@ class MyVpnService: VpnService() {
     }
 
 
-    private fun createNotification() {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent, PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val notification = NotificationCompat.Builder(this, NotificationUtils.CHANNEL_ID)
-            .setContentTitle("vpn Active")
-            .setContentText("vpn_notification_content")
-            .setSmallIcon(android.R.drawable.ic_lock_lock).setContentIntent(pendingIntent)
-            .setOngoing(true).setPriority(NotificationCompat.PRIORITY_LOW)
-            .setCategory(Notification.CATEGORY_SERVICE)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).build()
-
-        startForeground(NotificationUtils.NOTIFICATION_ID, notification)
-    }
-
     private fun startVpn(protectionLevel: ProtectionLevel) {
         val emptyIntent = PendingIntent.getActivity(
             this,
@@ -80,6 +59,7 @@ class MyVpnService: VpnService() {
 
         val builder = Builder().apply {
             addAddress(Constants.Address, 32)
+            addRoute("0.0.0.0", 0)
             addDnsServer(protectionLevel.primaryDns)
             addDnsServer(protectionLevel.secondaryDns)
             setSession("SafeDNS")

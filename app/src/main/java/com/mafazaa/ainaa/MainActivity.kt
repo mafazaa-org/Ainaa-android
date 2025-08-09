@@ -1,8 +1,10 @@
 package com.mafazaa.ainaa
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.*
 import android.app.AppOpsManager.*
 import android.content.*
+import android.content.pm.*
 import android.net.*
 import android.net.VpnService.*
 import android.os.*
@@ -120,7 +122,7 @@ class MainActivity: ComponentActivity() {
                             TopBar(
                                 canBlock = MyVpnService.isRunning,
                                 blockSpecificApp = {
-                                        showBlockAppsDialog = true
+                                    showBlockAppsDialog = true
                                 },
                                 supportUs = {
                                     backStack.add(Screen.Support)
@@ -190,7 +192,7 @@ class MainActivity: ComponentActivity() {
                                                                 viewModel.savePhoneNumber(
                                                                     phoneNumber
                                                                 )
-                                                                startVpnService(selectedLevel )
+                                                                startVpnService(selectedLevel)
                                                                 startService(
                                                                     Intent(
                                                                         this,
@@ -237,27 +239,32 @@ class MainActivity: ComponentActivity() {
                     }
                 }
             }
-            NotificationUtils.createNotificationChannel(this)
         }
     }
 
     private fun refreshPermissionState() {
         val appOps = getSystemService(APP_OPS_SERVICE) as AppOpsManager
 
-        permissionState = if (prepare(this) != null) {
-            PermissionState.Vpn
-        } else if (!canDrawOverlays(this)) {
-            PermissionState.Overlay
-        } else if (appOps.checkOpNoThrow(
-                OPSTR_GET_USAGE_STATS,
-                myUid(),
-                this.packageName
-            ) != MODE_ALLOWED
-        ) {
-            PermissionState.UsageStats
-        } else {
-            PermissionState.Granted
-        }
+        permissionState =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(this, POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                PermissionState.Notification
+            } else if (prepare(this) != null) {
+                PermissionState.Vpn
+            } else if (!canDrawOverlays(this)) {
+                PermissionState.Overlay
+            } else if (appOps.checkOpNoThrow(
+                    OPSTR_GET_USAGE_STATS,
+                    myUid(),
+                    this.packageName
+                ) != MODE_ALLOWED
+            ) {
+                PermissionState.UsageStats
+            } else {
+                PermissionState.Granted
+            }
 
     }
 
@@ -307,8 +314,15 @@ class MainActivity: ComponentActivity() {
     companion object {
         private const val VPN_REQUEST_CODE = 100
     }
+
     private fun grantPermission() {
         when (permissionState) {
+            PermissionState.Notification -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestPermissions(arrayOf(POST_NOTIFICATIONS), 0)
+                }
+            }
+
             PermissionState.Vpn -> prepareVpnService()
             PermissionState.Overlay -> requestDrawOverlaysPermission()
             PermissionState.UsageStats -> requestUsageStatsPermission()

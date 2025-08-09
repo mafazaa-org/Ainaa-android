@@ -5,4 +5,5 @@ object Constants {
     const val CHECK_INTERVAL=2500L
     const val supportUrl = "https://www.mafazaa.com/support_us"
     const val joinUrl = "https://www.mafazaa.com/join"
+    const val releaseName = "app-release.apk"
 }
