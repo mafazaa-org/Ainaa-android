@@ -83,6 +83,9 @@ if %ERRORLEVEL% equ 0 (
 echo Repository is clean: no unstaged changes, untracked files, or staged changes.
 
 
+set /p NEW_VERSION_CODE=<versionCode
+set /a NEW_VERSION_CODE=%NEW_VERSION_CODE%+1
+
 :: Update version in build.gradle.kts
 powershell -Command "(Get-Content app\build.gradle.kts) -replace 'versionCode = \d+', 'versionCode = 1' | Set-Content app\build.gradle.kts"
 powershell -Command "(Get-Content app\build.gradle.kts) -replace 'versionName = \".*\"', 'versionName = \"%NEW_VERSION_V%\"' | Set-Content app\build.gradle.kts"
@@ -106,9 +109,7 @@ git commit -m "updated version info to %NEW_VERSION_V%"
 
 git tag %NEW_VERSION_V% -f
 git push upstream
-git push --tags upstream
-
-echo %NEW_VERSION_V% > version
+git push --tags upstream -f
 
 :: Create GitHub release with both APK and AAB
 gh release create %NEW_VERSION_V% --generate-notes ^
@@ -120,5 +121,7 @@ echo Release %NEW_VERSION_V% completed successfully!
 echo APK location: app\build\outputs\apk\release\app-release.apk
 echo AAB location: app\build\outputs\bundle\release\app-release.aab
 echo.
+
+echo %NEW_VERSION_CODE% > versionCode
 
 endlocal
