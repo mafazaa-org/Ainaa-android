@@ -72,7 +72,7 @@ if %ERRORLEVEL% equ 0 (
     )
 )
 
-gh release view %NEW_VERSION_V% -R https://github.com/mafazaa-org/Ainaa-windows >nul 2>&1
+gh release view %NEW_VERSION_V% -R https://github.com/mafazaa-org/Ainaa-android >nul 2>&1
 if %ERRORLEVEL% equ 0 (
     echo Release with tag '%NEW_VERSION_V%' already exists!
     exit /b 1
@@ -84,8 +84,8 @@ echo Repository is clean: no unstaged changes, untracked files, or staged change
 
 
 :: Update version in build.gradle.kts
-powershell -Command "(Get-Content app\build.gradle.kts) -replace 'versionCode = \d+', 'versionCode = %NEW_VERSION_CODE%' | Set-Content app\build.gradle.kts"
-powershell -Command "(Get-Content app\build.gradle.kts) -replace 'versionName = \".*\"', 'versionName = \"%NEW_VERSION%\"' | Set-Content app\build.gradle.kts"
+powershell -Command "(Get-Content app\build.gradle.kts) -replace 'versionCode = \d+', 'versionCode = 1' | Set-Content app\build.gradle.kts"
+powershell -Command "(Get-Content app\build.gradle.kts) -replace 'versionName = \".*\"', 'versionName = \"%NEW_VERSION_V%\"' | Set-Content app\build.gradle.kts"
 
 echo Building release APK and Bundle...
 
@@ -112,8 +112,8 @@ echo %NEW_VERSION_V% > version
 
 :: Create GitHub release with both APK and AAB
 gh release create %NEW_VERSION_V% --generate-notes ^
-    "app\build\outputs\apk\release\app-release.apk#Release APK" ^
-    "app\build\outputs\bundle\release\app-release.aab#Release Bundle"
+    "app\build\outputs\apk\release\app-release.apk#app-release.apk" ^
+    "app\build\outputs\bundle\release\app-release.aab#app-release.aab"
 
 echo.
 echo Release %NEW_VERSION_V% completed successfully!
