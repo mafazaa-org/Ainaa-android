@@ -45,7 +45,7 @@ class MainActivity: ComponentActivity() {
 
         refreshPermissionState()
         setContent {
-            ProtectMeTheme {
+            ainaaTheme {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     val backStack = remember {
                         mutableStateListOf(

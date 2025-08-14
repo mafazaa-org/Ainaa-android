@@ -20,7 +20,7 @@
         android:name="com.mafazaa.ainaa.MyApp"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ProtectMe"
+        android:theme="@style/Theme.ainaa"
         android:layoutDirection="rtl"
         tools:targetApi="31">
 
