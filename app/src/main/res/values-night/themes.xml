@@ -4,6 +4,6 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
         <item name="colorPrimary">@color/red</item>
-
+        <item name="android:forceDarkAllowed">false</item>
     </style>
 </resources>
