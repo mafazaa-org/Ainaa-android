@@ -20,6 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Protect me"
+rootProject.name = "Ainaa"
 include(":app")
  

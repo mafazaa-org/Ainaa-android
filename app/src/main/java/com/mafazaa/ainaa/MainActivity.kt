@@ -5,13 +5,10 @@ import android.app.*
 import android.app.AppOpsManager.*
 import android.content.*
 import android.content.pm.*
-import android.net.*
 import android.net.VpnService.*
 import android.os.*
 import android.os.Process.*
-import android.provider.*
 import android.provider.Settings.*
-import android.util.Log
 import android.widget.*
 import androidx.activity.*
 import androidx.activity.compose.*
@@ -23,7 +20,6 @@ import androidx.compose.ui.*
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.unit.*
 import androidx.core.content.*
-import androidx.core.net.*
 import androidx.navigation3.runtime.*
 import androidx.navigation3.ui.*
 import com.mafazaa.ainaa.Constants.joinUrl
@@ -35,11 +31,7 @@ import com.mafazaa.ainaa.model.*
 import com.mafazaa.ainaa.services.*
 import com.mafazaa.ainaa.ui.*
 import com.mafazaa.ainaa.ui.theme.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.*
-import java.io.File
 
 class MainActivity: ComponentActivity() {
     private var permissionState by mutableStateOf(PermissionState.Vpn)
@@ -51,7 +43,7 @@ class MainActivity: ComponentActivity() {
 
         refreshPermissionState()
         setContent {
-            ProtectMeTheme {
+            AinaaTheme {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     val backStack = remember {
                         mutableStateListOf(
