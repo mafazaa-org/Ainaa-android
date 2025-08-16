@@ -61,13 +61,13 @@ fun ReportProblemDialog(
                         text = "الإبلاغ عن مشكلة",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black,
+
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
                 // Name Field
-                Text("الاسم", fontSize = 14.sp, color = Color.Black)
+                Text("الاسم", fontSize = 14.sp)
                 OutlinedTextField(
                     value = name,
                     onValueChange = { it: String -> name = it },
@@ -85,7 +85,7 @@ fun ReportProblemDialog(
 
                 // Phone Field
                 Spacer(Modifier.height(12.dp))
-                Text("رقم الهاتف", fontSize = 14.sp, color = Color.Black)
+                Text("رقم الهاتف", fontSize = 14.sp)
                 OutlinedTextField(
                     value = phone,
                     onValueChange = { it: String -> phone = it },
@@ -98,7 +98,7 @@ fun ReportProblemDialog(
 
                 // Email Field
                 Spacer(Modifier.height(12.dp))
-                Text("البريد الإلكتروني", fontSize = 14.sp, color = Color.Black)
+                Text("البريد الإلكتروني", fontSize = 14.sp)
                 OutlinedTextField(
                     value = email,
                     onValueChange = { it: String -> email = it },
@@ -117,7 +117,7 @@ fun ReportProblemDialog(
 
                 // Problem Field
                 Spacer(Modifier.height(12.dp))
-                Text("المشكلة", fontSize = 14.sp, color = Color.Black)
+                Text("المشكلة", fontSize = 14.sp)
                 OutlinedTextField(
                     value = problem,
                     onValueChange = { it: String -> problem = it },

@@ -1,6 +1,6 @@
 package com.mafazaa.ainaa.data
 
-import com.mafazaa.ainaa.Constants
+import com.mafazaa.ainaa.*
 import com.mafazaa.ainaa.model.*
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
@@ -11,6 +11,7 @@ import io.ktor.http.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.*
 import kotlinx.serialization.json.Json.Default.parseToJsonElement
+import java.io.*
 
 class KtorRepo: RemoteRepo {
 
@@ -25,7 +26,8 @@ class KtorRepo: RemoteRepo {
     }
     val latestVersionUrl =
         "https://api.github.com/repos/mafazaa-org/Ainaa-android/releases/latest"
-    suspend fun getLatest(): Version? {
+
+    override suspend fun getLatestVersion(): Version? {
         return try {
             val client = HttpClient(Android)
             val response: HttpResponse =
@@ -42,12 +44,33 @@ class KtorRepo: RemoteRepo {
                 .mapNotNull { it.jsonObject }
                 .firstOrNull { it["name"]?.jsonPrimitive?.content == Constants.releaseName }
                 ?.get("browser_download_url")?.jsonPrimitive?.content.orEmpty()
-            return Version(tagName, name, downloadUrl, body)
+            val version = tagName.removePrefix("v").toInt()
+            return Version(version, name, downloadUrl, body)
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
     }
+
+    override suspend fun downloadFile(url: String, file: File): Boolean {
+        return try {
+            val response: HttpResponse = client.get(url)
+            if (response.status.isSuccess()) {
+                val bytes = response.readBytes()
+                file.apply {
+                    parentFile?.mkdirs() // Ensure parent directories exist
+                    writeBytes(bytes) // Write the downloaded bytes to the file
+                }
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<SubmitResult> = flow {
         emit(SubmitResult.Loading)
         try {
@@ -93,13 +116,6 @@ class KtorRepo: RemoteRepo {
 
 suspend fun main() {
     val repo = KtorRepo()
-    print(repo.getLatest())
-
+    print(repo.getLatestVersion())
 }
 
-data class Version(
-    val tagName: String,
-    val name: String,
-    val downloadUrl: String,
-    val body: String
-)

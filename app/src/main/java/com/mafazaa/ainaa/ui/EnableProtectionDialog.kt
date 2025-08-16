@@ -38,7 +38,6 @@ fun EnableProtectionDialog(
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_close_24),
                         contentDescription = "close",
-                        tint = Color.Black
                     )
                 }
 
@@ -47,7 +46,6 @@ fun EnableProtectionDialog(
                     text = " هل ترغب في تفعيل الحماية على جهازك؟",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
                     modifier = Modifier
                         .padding(top = 16.dp)
                 )

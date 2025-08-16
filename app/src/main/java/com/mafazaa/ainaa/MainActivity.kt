@@ -11,6 +11,7 @@ import android.os.*
 import android.os.Process.*
 import android.provider.*
 import android.provider.Settings.*
+import android.util.Log
 import android.widget.*
 import androidx.activity.*
 import androidx.activity.compose.*
@@ -34,7 +35,11 @@ import com.mafazaa.ainaa.model.*
 import com.mafazaa.ainaa.services.*
 import com.mafazaa.ainaa.ui.*
 import com.mafazaa.ainaa.ui.theme.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.*
+import java.io.File
 
 class MainActivity: ComponentActivity() {
     private var permissionState by mutableStateOf(PermissionState.Vpn)
@@ -42,6 +47,7 @@ class MainActivity: ComponentActivity() {
         super.onCreate(savedInstanceState)
         val viewModel: MainViewModel = getViewModel()
         viewModel.loadInstalledApps(getAllApps(this))
+        viewModel.handleUpdateStatus(this)
 
         refreshPermissionState()
         setContent {
@@ -134,7 +140,9 @@ class MainActivity: ComponentActivity() {
                                 }
                             )
                         }, bottomBar = {
-                            BottomBar(Modifier) {
+                            BottomBar(modifier = Modifier,
+                                appVersion = BuildConfig.VERSION_CODE,
+                                androidVersion = Build.VERSION.RELEASE) {
                                 if (MyVpnService.isRunning) {
                                     backStack.add(Screen.ProtectionActivated)
                                 }
@@ -156,7 +164,13 @@ class MainActivity: ComponentActivity() {
                                         ProtectionActivatedScreen(
                                             onSupportClick = { backStack.add(Screen.Support) },
                                             onBlockAppClick = { showBlockAppsDialog = true },
-                                            onReportClick = { showReportDialog = true })
+                                            onReportClick = { showReportDialog = true },
+                                            onUpdateClick= {
+                                               viewModel.onUpdateClicked(this@MainActivity)
+                                            }
+                                            , updateStatus = viewModel.updateStatus.value
+                                        )
+
                                     }
 
                                     Screen.Support -> NavEntry(key) {
@@ -265,21 +279,8 @@ class MainActivity: ComponentActivity() {
             } else {
                 PermissionState.Granted
             }
-
     }
 
-    fun openUrl(url: String) {
-        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-        intent.addCategory(Intent.CATEGORY_BROWSABLE)
-        startActivity(intent)
-    }
-
-    private fun prepareVpnService() {
-        val intent = VpnService.prepare(this)
-        if (intent != null) {
-            startActivityForResult(intent, VPN_REQUEST_CODE)
-        }
-    }
 
     override fun onResume() {
         super.onResume()
@@ -302,18 +303,9 @@ class MainActivity: ComponentActivity() {
         MyVpnService.isRunning = true
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
 
-    private fun requestUsageStatsPermission() {
-        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-        startActivity(intent)
-    }
 
-    companion object {
-        private const val VPN_REQUEST_CODE = 100
-    }
+
 
     private fun grantPermission() {
         when (permissionState) {
@@ -323,17 +315,14 @@ class MainActivity: ComponentActivity() {
                 }
             }
 
-            PermissionState.Vpn -> prepareVpnService()
+            PermissionState.Vpn -> requestVpnPermission()
             PermissionState.Overlay -> requestDrawOverlaysPermission()
             PermissionState.UsageStats -> requestUsageStatsPermission()
             PermissionState.Granted -> {}
         }
     }
 
-    private fun requestDrawOverlaysPermission() {
-        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-        startActivity(intent)
-    }
+
 }
 
 

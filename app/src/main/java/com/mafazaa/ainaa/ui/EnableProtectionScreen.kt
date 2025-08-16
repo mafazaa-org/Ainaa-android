@@ -1,7 +1,9 @@
 package com.mafazaa.ainaa.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
@@ -22,12 +24,9 @@ fun EnableProtectionScreen(
     enableProtection: (ProtectionLevel, String) -> Unit,
     selectedLevel: ProtectionLevel,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
         Column(
+            modifier = Modifier.fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp) // optional spacing between the two
         ) {
@@ -37,7 +36,7 @@ fun EnableProtectionScreen(
             })
             ProtectYourDevice({ enableProtection(selectedLevel, it) }, report)
         }
-    }
+
 }
 
 @Composable
@@ -54,7 +53,6 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
         ) {
             Text(
                 text = "قم بحماية جهازك الآن",
-                color = Color.Black,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
             )
@@ -78,7 +76,6 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
                 .wrapContentHeight(),
             isError = !isPhoneNumberValid,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-
             )
         Spacer(Modifier.size(16.dp))
 
@@ -92,7 +89,6 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
             colors = ButtonDefaults.buttonColors(
                 disabledContainerColor = Color.LightGray,
                 containerColor = red
-
             ),
             enabled = isPhoneNumberValid
         ) {

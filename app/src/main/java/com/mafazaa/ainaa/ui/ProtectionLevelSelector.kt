@@ -29,7 +29,6 @@ fun ProtectionLevelSelector(
         Text(
             text = "اختر مستوى الحماية",
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
             fontSize = 18.sp,
             modifier = Modifier.padding(bottom = 8.dp),
             textAlign = TextAlign.Right
@@ -103,7 +102,6 @@ fun ProtectionCard(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = title,
-                    color = Color.Black,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                 )
@@ -111,8 +109,7 @@ fun ProtectionCard(
 
             Text(
                 text = description,
-                fontSize = 12.sp,
-                color = Color.Black,
+                fontSize = 15.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 12.dp),
                 textAlign = TextAlign.Right
             )
@@ -128,7 +125,7 @@ fun ProtectionCard(
                     Text(
                         text = label,
                         color = red,
-                        fontSize = 13.sp,
+                        fontSize = 15.sp,
                         modifier = Modifier
                             .background(Color(0xFFFFEBEE), RoundedCornerShape(16.dp))
                             .padding(horizontal = 12.dp, vertical = 6.dp)

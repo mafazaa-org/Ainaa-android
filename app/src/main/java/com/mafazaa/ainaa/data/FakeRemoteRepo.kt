@@ -1,9 +1,12 @@
 package com.mafazaa.ainaa.data
 
+import android.net.Uri
 import com.mafazaa.ainaa.model.Report
+import com.mafazaa.ainaa.model.Version
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.io.File
 
 object FakeRemoteRepo:RemoteRepo {
     override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<SubmitResult> =flow {
@@ -16,5 +19,13 @@ object FakeRemoteRepo:RemoteRepo {
         emit(SubmitResult.Loading)
         delay(200)
         emit(SubmitResult.Success)
+    }
+
+    override suspend fun getLatestVersion(): Version? {
+       return null
+    }
+
+    override suspend fun downloadFile(url: String, file: File): Boolean {
+        return false
     }
 }

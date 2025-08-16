@@ -40,7 +40,7 @@ fun ConfirmDeleteDialog(
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_close_24),
                         contentDescription = "close",
-                        tint = Color.Black
+
                     )
                 }
 
@@ -49,7 +49,6 @@ fun ConfirmDeleteDialog(
                     text = "هل انت متأكد من انك تريد مسح ${app.name}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
                     modifier = Modifier
                         .padding(top = 16.dp)
                 )
@@ -58,7 +57,6 @@ fun ConfirmDeleteDialog(
                 Text(
                     text = "",//todo
                     fontSize = 14.sp,
-                    color = Color.DarkGray,
                     modifier = Modifier
                         .padding(top = 8.dp, bottom = 24.dp)
                 )

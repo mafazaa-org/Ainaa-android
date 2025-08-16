@@ -8,7 +8,7 @@ import org.koin.dsl.*
 
 val appModule = module {
 
-    single<RemoteRepo> {  if(BuildConfig.DEBUG) FakeRemoteRepo else KtorRepo() }
+    single<RemoteRepo> {  KtorRepo() }
     single<LocalData> { LocalData(androidContext().getSharedPreferences("App",MODE_PRIVATE)) }
 
     viewModel { MainViewModel(get(),get()) }

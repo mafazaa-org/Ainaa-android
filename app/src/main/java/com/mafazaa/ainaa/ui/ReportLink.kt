@@ -8,26 +8,29 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
-import com.mafazaa.ainaa.ui.theme.*
 
 @Composable
 fun ReportLink(modifier: Modifier = Modifier, onReportClick: () -> Unit) {
+    TowColorText(modifier, "اكتشفت ثغرة او موقع غير محجوب؟ ", "أخبرنا بها", onReportClick)
+}
 
+@Composable
+fun TowColorText(modifier: Modifier= Modifier, black: String, red: String, onClick: () -> Unit) {
     Text(
         buildAnnotatedString {
-            append("اكتشفت ثغرة او موقع غير محجوب؟ ")
+            append(black)
             withStyle(
                 style = SpanStyle(
-                    color = red,
+                    color = com.mafazaa.ainaa.ui.theme.red,
                     fontWeight = FontWeight.Bold,
                     textDecoration = TextDecoration.Underline
                 )
             ) {
-                append("أخبرنا بها")
+                append(red)
             }
         },
         fontSize = 14.sp,
         textAlign = TextAlign.Center,
-        modifier = modifier.clickable(onClick = onReportClick)
+        modifier = modifier.clickable(onClick = onClick)
     )
 }
