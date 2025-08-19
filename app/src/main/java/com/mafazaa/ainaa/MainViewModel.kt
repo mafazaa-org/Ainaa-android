@@ -113,5 +113,4 @@ class MainViewModel(
     fun savePhoneNumber(phoneNumber: String) {
         localData.phoneNum = phoneNumber
     }
-
 }

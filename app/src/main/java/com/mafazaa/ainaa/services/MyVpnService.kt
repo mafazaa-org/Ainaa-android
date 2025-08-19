@@ -59,7 +59,7 @@ class MyVpnService: VpnService() {
 
         val builder = Builder().apply {
             addAddress(Constants.Address, 32)
-            addRoute("0.0.0.0", 0)
+
             addDnsServer(protectionLevel.primaryDns)
             addDnsServer(protectionLevel.secondaryDns)
             setSession("SafeDNS")
