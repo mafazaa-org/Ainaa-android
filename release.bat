@@ -104,9 +104,9 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 call gradlew bundleRelease
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-apksigner sign --ks ainaa.jks --ks-key-alias ainaa --out ainaa.apk app\build\outputs\apk\release\app-release-unsigned.apk
+call apksigner sign --ks ainaa.jks --ks-key-alias ainaa --out ainaa.apk app\build\outputs\apk\release\app-release-unsigned.apk
 
-apksigner verify ainaa.apk
+call apksigner verify ainaa.apk
 
 
 git add .
@@ -120,6 +120,11 @@ git push --tags upstream -f
 gh release create %NEW_VERSION_V% --generate-notes ^
     "ainaa.apk#ainaa.apk" ^
     "app\build\outputs\bundle\release\app-release.aab#ainaa.aab"
+
+del ainaa-old.apk
+del ainaa-old.apk.idsig
+ren ainaa.apk ainaa-old.apk
+ren ainaa.apk.idsig ainaa-old.apk.idsig
 
 echo.
 echo Release %NEW_VERSION_V% completed successfully!
