@@ -100,10 +100,6 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 call gradlew assembleRelease
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-:: Build Android App Bundle
-call gradlew bundleRelease
-if %errorlevel% neq 0 exit /b %errorlevel%
-
 call apksigner sign --ks ainaa.jks --ks-key-alias ainaa --out ainaa.apk app\build\outputs\apk\release\app-release-unsigned.apk
 
 call apksigner verify ainaa.apk
@@ -119,8 +115,7 @@ git push --tags upstream -f
 
 :: Create GitHub release with both APK and AAB
 gh release create %NEW_VERSION_V% --generate-notes ^
-    "ainaa.apk#ainaa.apk" ^
-    "app\build\outputs\bundle\release\app-release.aab#ainaa.aab"
+    "ainaa.apk#ainaa.apk"
 
 del _ainaa.apk
 del _ainaa.apk.idsig
@@ -130,7 +125,6 @@ ren ainaa.apk.idsig _ainaa.apk.idsig
 echo.
 echo Release %NEW_VERSION_V% completed successfully!
 echo APK location: _ainaa.apk
-echo AAB location: app\build\outputs\bundle\release\app-release.aab
 echo.
 
 
