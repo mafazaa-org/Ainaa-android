@@ -113,8 +113,8 @@ git push --tags upstream -f
 
 :: Create GitHub release with both APK and AAB
 gh release create %NEW_VERSION_V% --generate-notes ^
-    "app\build\outputs\apk\release\app-release.apk#app-release.apk" ^
-    "app\build\outputs\bundle\release\app-release.aab#app-release.aab"
+    "app\build\outputs\apk\release\app-release.apk#ainaa.apk" ^
+    "app\build\outputs\bundle\release\app-release.aab#ainaa.aab"
 
 echo.
 echo Release %NEW_VERSION_V% completed successfully!
