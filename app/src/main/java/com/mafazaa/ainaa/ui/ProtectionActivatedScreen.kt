@@ -9,8 +9,8 @@ import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
-import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
+import androidx.compose.ui.window.*
 import com.mafazaa.ainaa.model.*
 import com.mafazaa.ainaa.ui.theme.*
 
@@ -19,9 +19,11 @@ fun ProtectionActivatedScreen(
     onSupportClick: () -> Unit,
     onBlockAppClick: () -> Unit,
     onReportClick: () -> Unit,
+    onConfirmProtectionClick: () -> Unit,
     onUpdateClick: (updateState: UpdateState) -> Unit = { /* Default no-op */ },
     updateState: UpdateState = UpdateState.NoUpdate,
-) {
+
+    ) {
     Column(
         modifier = Modifier
             .padding(24.dp)
@@ -37,12 +39,18 @@ fun ProtectionActivatedScreen(
             textAlign = TextAlign.Center
         )
 
-        // Subtitle
+// Subtitle
         Text(
-            text = "يمكنك أيضاً حجب تطبيق معين: اضغط الزر في الأسفل",
+            text = "كيف أتأكد ان الحماية تعمل؟",
             fontSize = 14.sp,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+            color = red,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier
+                .padding(top = 8.dp, bottom = 24.dp)
+                .clickable {
+                    onConfirmProtectionClick()
+                }
         )
 
         // Buttons row
@@ -89,15 +97,5 @@ fun ProtectionActivatedScreen(
         TowColorText(black = black, red = red, onClick = { onUpdateClick(updateState) })
 
     }
-}
-
-@Preview
-@Composable
-fun ProtectionActivatedScreenPreview() {
-    ProtectionActivatedScreen(
-        onSupportClick = {},
-        onBlockAppClick = {},
-        onReportClick = {}
-    )
 }
 

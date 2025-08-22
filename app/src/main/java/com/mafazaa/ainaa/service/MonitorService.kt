@@ -144,15 +144,15 @@ class MonitorService: Service() {
     private suspend fun checkAndRedirect() {
         val currentApp = getForegroundApp()
         val blockedApp = localData.apps
-        if ((currentApp !in blockedApp || currentApp == null )&& isRunning.value ) {
-            Log.d(TAG, "Allowed app: $currentApp")
-        } else {
+        if (currentApp in blockedApp && currentApp != null && isRunning.value) {
             serviceScope.launch (Dispatchers.Main){
-            showLockScreen()  }
+                showLockScreen()  }
             Lg.d(
                 TAG,
                 "Blocked app: $currentApp "
             )
+        } else {
+            Log.d(TAG, "Allowed app: $currentApp")
         }
         delay(Constants.CHECK_INTERVAL)
     }

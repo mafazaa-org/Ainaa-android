@@ -29,7 +29,7 @@ fun Context.installApk(apkFile: File) {
     }
 }
 
-fun ComponentActivity.openUrl(url: String) {
+fun Context.openUrl(url: String) {
     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
     intent.addCategory(Intent.CATEGORY_BROWSABLE)
     startActivity(intent)

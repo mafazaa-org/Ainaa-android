@@ -5,6 +5,7 @@ import android.app.*
 import android.app.AppOpsManager.*
 import android.content.*
 import android.content.pm.*
+import android.net.Uri
 import android.net.VpnService.*
 import android.os.*
 import android.os.Process.*
@@ -21,7 +22,9 @@ import androidx.compose.ui.platform.*
 import androidx.core.content.*
 import androidx.navigation3.runtime.*
 import androidx.navigation3.ui.*
+import com.mafazaa.ainaa.Constants.contactSupportUrl
 import com.mafazaa.ainaa.Constants.joinUrl
+import com.mafazaa.ainaa.Constants.safeSearchUrl
 import com.mafazaa.ainaa.Constants.supportUrl
 import com.mafazaa.ainaa.data.*
 import com.mafazaa.ainaa.model.*
@@ -29,6 +32,7 @@ import com.mafazaa.ainaa.service.*
 import com.mafazaa.ainaa.ui.*
 import com.mafazaa.ainaa.ui.theme.*
 import org.koin.androidx.viewmodel.ext.android.*
+import androidx.core.net.toUri
 
 class MainActivity: ComponentActivity() {
     private var vpnPermission by mutableStateOf(false)
@@ -89,12 +93,18 @@ class MainActivity: ComponentActivity() {
                 }
                 var firstTimeDialog by remember { mutableStateOf(MyApp.isFirstTime) }
                 if (firstTimeDialog) {
-                    FirstTimeDialog(
+                    OkDialog(
+                        title = "هذا إصدار تجريبي",
+                        message = """
+يرجى ملاحظة أن هذا التطبيق في مرحلة التجربة وقد يحتوي على بعض المشاكل.
+برجاء إبلاغنا عن أي مشكلة تحدث معك، و انتظار الاصدارات القادمة المحسنة بإذن الله.
+""".trimIndent(),
                         onDismiss = {
                             firstTimeDialog = false
                             MyApp.isFirstTime = false
                         }
                     )
+
                 }
                 var permissionState by remember { mutableStateOf<PermissionState?>(null) }
                 if (permissionState != null) {
@@ -166,6 +176,21 @@ class MainActivity: ComponentActivity() {
                         entryProvider = { key ->
                             when (key) {
                                 Screen.ProtectionActivated -> NavEntry(key) {
+                                    var showHowItWorks by remember {
+                                        mutableStateOf(false)
+                                    }
+                                    if (showHowItWorks) {
+                                        HowItWorksDialog(
+                                            onDismiss = { showHowItWorks = false },
+                                            onContactClicked = {
+                                                context.openUrl(contactSupportUrl)
+                                            },
+                                            onSafeSearchClicked = {
+                                                context.openUrl(safeSearchUrl)
+                                            },
+                                            image = "file:///android_asset/howToKnow.jpg".toUri()
+                                        )
+                                    }
                                     ProtectionActivatedScreen(
                                         onSupportClick = { backStack.add(Screen.Support) },
                                         onBlockAppClick = {
@@ -203,11 +228,16 @@ class MainActivity: ComponentActivity() {
                                                     -> {
                                                     viewModel.handleUpdateStatus()
                                                 }
+
                                                 else -> {
                                                 }
                                             }
 
-                                        }, updateState = viewModel.updateState.value
+                                        },
+                                        updateState = viewModel.updateState.value,
+                                        onConfirmProtectionClick = {
+                                            showHowItWorks = true
+                                        },
                                     )
 
                                 }
@@ -350,6 +380,7 @@ class MainActivity: ComponentActivity() {
                     requestPermissions(arrayOf(POST_NOTIFICATIONS), 0)
                 }
             }
+
             PermissionState.Vpn -> requestVpnPermission()
             PermissionState.Overlay -> requestDrawOverlaysPermission()
             PermissionState.UsageStats -> requestUsageStatsPermission()

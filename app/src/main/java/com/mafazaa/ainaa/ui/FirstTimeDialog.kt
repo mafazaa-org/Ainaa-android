@@ -13,6 +13,16 @@ fun FirstTimeDialog(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
 ) {
+
+}
+@Composable
+fun OkDialog(
+    modifier: Modifier = Modifier,
+    title: String,
+    message: String,
+    onDismiss: () -> Unit,
+    okText: String = "موافق",
+) {
     Dialog(
         onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
@@ -23,16 +33,13 @@ fun FirstTimeDialog(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "هذا إصدار تجريبي",
+                    text = title,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = """
-يرجى ملاحظة أن هذا التطبيق في مرحلة التجربة وقد يحتوي على بعض المشاكل.
-برجاء إبلاغنا عن أي مشكلة تحدث معك، و انتظار الاصدارات القادمة المحسنة بإذن الله.
-""",
+                    text = message,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -42,13 +49,10 @@ fun FirstTimeDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     Button(onClick = onDismiss) {
-                        Text("موافق")
+                        Text(okText)
                     }
                 }
             }
-
         }
     }
-
-
 }
