@@ -108,6 +108,7 @@ call apksigner sign --ks ainaa.jks --ks-key-alias ainaa --out ainaa.apk app\buil
 
 call apksigner verify ainaa.apk
 
+echo %NEW_VERSION_CODE% > versionCode
 
 git add .
 git commit -m "updated version info to %NEW_VERSION_V%"
@@ -121,17 +122,16 @@ gh release create %NEW_VERSION_V% --generate-notes ^
     "ainaa.apk#ainaa.apk" ^
     "app\build\outputs\bundle\release\app-release.aab#ainaa.aab"
 
-del ainaa-old.apk
-del ainaa-old.apk.idsig
-ren ainaa.apk ainaa-old.apk
-ren ainaa.apk.idsig ainaa-old.apk.idsig
+del _ainaa.apk
+del _ainaa.apk.idsig
+ren ainaa.apk _ainaa.apk
+ren ainaa.apk.idsig _ainaa.apk.idsig
 
 echo.
 echo Release %NEW_VERSION_V% completed successfully!
-echo APK location: ainaa.apk
+echo APK location: _ainaa.apk
 echo AAB location: app\build\outputs\bundle\release\app-release.aab
 echo.
 
-echo %NEW_VERSION_CODE% > versionCode
 
 endlocal
