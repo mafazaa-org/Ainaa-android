@@ -1,7 +1,9 @@
 package com.mafazaa.ainaa.data
 
+import android.util.Log
 import com.mafazaa.ainaa.*
 import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.model.repo.*
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.plugins.logging.*
@@ -40,12 +42,14 @@ class KtorRepo: RemoteRepo {
             val name = json["name"]?.jsonPrimitive?.content.orEmpty()
             val body = json["body"]?.jsonPrimitive?.content.orEmpty()
             val assets = json["assets"]?.jsonArray.orEmpty()
-            val downloadUrl = assets
-                .mapNotNull { it.jsonObject }
-                .firstOrNull { it["name"]?.jsonPrimitive?.content == Constants.releaseName }
-                ?.get("browser_download_url")?.jsonPrimitive?.content.orEmpty()
+            val downloadAsset = assets
+                .map { it.jsonObject }
+                .firstOrNull { it["name"]?.jsonPrimitive?.content?.contains(Constants.releaseApkName) == true }
+            val downloadUrl =
+                downloadAsset?.get("browser_download_url")?.jsonPrimitive?.content.orEmpty()
+            val size = downloadAsset?.get("size")?.jsonPrimitive?.longOrNull ?: 0L
             val version = tagName.removePrefix("v").toInt()
-            return Version(version, name, downloadUrl, body)
+            return Version(version, name, downloadUrl, body,size)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -54,6 +58,7 @@ class KtorRepo: RemoteRepo {
 
     override suspend fun downloadFile(url: String, file: File): Boolean {
         return try {
+            Log.d("KtorRepo", "Downloading file from $url to ${file.absolutePath}")
             val response: HttpResponse = client.get(url)
             if (response.status.isSuccess()) {
                 val bytes = response.readBytes()
@@ -71,8 +76,8 @@ class KtorRepo: RemoteRepo {
         }
     }
 
-    override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<SubmitResult> = flow {
-        emit(SubmitResult.Loading)
+    override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<NetworkResult> = flow {
+        emit(NetworkResult.Loading)
         try {
             val response: HttpResponse = client.post(googleFormUrl) {
                 contentType(ContentType.Application.FormUrlEncoded)
@@ -80,17 +85,17 @@ class KtorRepo: RemoteRepo {
             }
 
             if (!response.status.isSuccess()) {
-                emit(SubmitResult.Error("Failed: ${response.status}"))
+                emit(NetworkResult.Error("Failed: ${response.status}"))
             } else {
-                emit(SubmitResult.Success)
+                emit(NetworkResult.Success)
             }
         } catch (e: Exception) {
-            emit(SubmitResult.Error(e.localizedMessage))
+            emit(NetworkResult.Error(e.localizedMessage))
         }
     }
 
-    override fun submitReportToGoogleForm(report: Report): Flow<SubmitResult> = flow {
-        emit(SubmitResult.Loading)
+    override fun submitReportToGoogleForm(report: Report): Flow<NetworkResult> = flow {
+        emit(NetworkResult.Loading)
         try {
             val response: HttpResponse = client.post(googleFormUrl) {
                 contentType(ContentType.Application.FormUrlEncoded)
@@ -103,12 +108,12 @@ class KtorRepo: RemoteRepo {
             }
 
             if (!response.status.isSuccess()) {
-                emit(SubmitResult.Error("Failed: ${response.status}"))
+                emit(NetworkResult.Error("Failed: ${response.status}"))
             } else {
-                emit(SubmitResult.Success)
+                emit(NetworkResult.Success)
             }
         } catch (e: Exception) {
-            emit(SubmitResult.Error(e.localizedMessage))
+            emit(NetworkResult.Error(e.localizedMessage))
         }
 
     }

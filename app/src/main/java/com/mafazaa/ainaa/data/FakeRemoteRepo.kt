@@ -1,31 +1,25 @@
 package com.mafazaa.ainaa.data
 
-import android.net.Uri
 import com.mafazaa.ainaa.model.Report
 import com.mafazaa.ainaa.model.Version
+import com.mafazaa.ainaa.model.repo.RemoteRepo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.File
 
-object FakeRemoteRepo:RemoteRepo {
-    override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<SubmitResult> =flow {
-        emit(SubmitResult.Loading)
+object FakeRemoteRepo: RemoteRepo by KtorRepo() {
+    override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<NetworkResult> =flow {
+        emit(NetworkResult.Loading)
         delay(200)
-        emit(SubmitResult.Success)
+        emit(NetworkResult.Success)
     }
 
-    override fun submitReportToGoogleForm(report: Report): Flow<SubmitResult> =flow {
-        emit(SubmitResult.Loading)
+    override fun submitReportToGoogleForm(report: Report): Flow<NetworkResult> =flow {
+        emit(NetworkResult.Loading)
         delay(200)
-        emit(SubmitResult.Success)
+        emit(NetworkResult.Success)
     }
 
-    override suspend fun getLatestVersion(): Version? {
-       return null
-    }
 
-    override suspend fun downloadFile(url: String, file: File): Boolean {
-        return false
-    }
 }

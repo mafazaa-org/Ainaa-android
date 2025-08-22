@@ -19,8 +19,8 @@ fun ProtectionActivatedScreen(
     onSupportClick: () -> Unit,
     onBlockAppClick: () -> Unit,
     onReportClick: () -> Unit,
-    onUpdateClick: () -> Unit = { /* Default no-op */ },
-    updateStatus: UpdateStatus = UpdateStatus.NO_UPDATE,
+    onUpdateClick: (updateState: UpdateState) -> Unit = { /* Default no-op */ },
+    updateState: UpdateState = UpdateState.NoUpdate,
 ) {
     Column(
         modifier = Modifier
@@ -78,14 +78,15 @@ fun ProtectionActivatedScreen(
         }
         ReportLink(onReportClick = onReportClick)
         Spacer(modifier = Modifier.height(16.dp))
-        val ( black,red) = when (updateStatus) {
-            UpdateStatus.NO_UPDATE -> Pair("لا يوجد تحديث متاح","")
-            UpdateStatus.DOWNLOADING -> Pair( "جاري تحميل التحديث... الرجاء الانتظار","")
-            UpdateStatus.FAILED -> Pair("فشل تحميل التحديث", "حاول مرة أخرى")
-            UpdateStatus.DOWNLOADED -> Pair("تم تحميل التحديث", "تثبيت")
+        val (black, red) = when (updateState) {
+            UpdateState.NoUpdate -> Pair("لا يوجد تحديث متاح", "اضغط للتحقق")
+            UpdateState.Checking -> Pair("جاري التحقق من وجود تحديثات", "")
+            is UpdateState.Downloading -> Pair("جاري تحميل التحديث... الرجاء الانتظار", "")
+            is UpdateState.Failed -> Pair("فشل تحميل التحديث", "حاول مرة أخرى")
+            UpdateState.Downloaded -> Pair("تم تحميل التحديث", "تثبيت")
         }
-        TowColorText(black = black, red = red, onClick = onUpdateClick)
 
+        TowColorText(black = black, red = red, onClick = { onUpdateClick(updateState) })
 
     }
 }

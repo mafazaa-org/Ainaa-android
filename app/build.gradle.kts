@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.mafazaa.ainaa"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "v0.0.0"
@@ -43,12 +43,11 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.navigation.compose.jvmstubs)
-    //compose
+// Compose
     val composeBom = platform("androidx.compose:compose-bom:2024.09.02")
     implementation(composeBom)
     androidTestImplementation(composeBom)
-
+    implementation(libs.androidx.navigation.compose.jvmstubs)
     implementation("androidx.compose.runtime:runtime")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.foundation:foundation")
@@ -56,33 +55,37 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.compose.ui:ui-tooling")
-
-
     implementation("io.coil-kt.coil3:coil-compose:3.2.0")
 
-    implementation ("com.google.android.material:material:1.6.0")
-    //nav
+// Material
+    implementation("com.google.android.material:material:1.6.0")
+
+// Navigation
     implementation("androidx.navigation3:navigation3-runtime:1.0.0-alpha05")
     implementation("androidx.navigation3:navigation3-ui:1.0.0-alpha05")
     implementation(libs.androidx.navigation3.ui.android)
-    //ktor
+
+// Ktor
     implementation(platform("io.ktor:ktor-bom:3.2.2"))
     implementation("io.ktor:ktor-client-android")
     implementation("io.ktor:ktor-client-serialization")
     implementation("io.ktor:ktor-client-logging")
     implementation("io.ktor:ktor-client-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
-    // Koin for Android
+
+// Koin for Android
     implementation("io.insert-koin:koin-android:4.1.0")
     implementation("io.insert-koin:koin-androidx-compose:4.1.0")
     implementation("io.insert-koin:koin-androidx-workmanager:4.1.0")
 
-    //
+// Lifecycle
     implementation("androidx.lifecycle:lifecycle-common-java8:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.7.0")
-// SavedState
     implementation("androidx.savedstate:savedstate:1.2.1")
+
+// WorkManager
+    implementation("androidx.work:work-runtime-ktx:2.10.3")
 
 
     implementation(libs.androidx.core.ktx)

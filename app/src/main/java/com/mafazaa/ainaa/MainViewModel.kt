@@ -1,23 +1,26 @@
 package com.mafazaa.ainaa
 
-import android.content.*
 import android.util.*
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import com.mafazaa.ainaa.data.*
 import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.model.repo.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.io.File
 
 class MainViewModel(
     private val remoteRepo: RemoteRepo,
     private val localData: LocalData,
+    private val fileRepo: FileRepo ,
+    private val updateRepo: UpdateRepo
 ): ViewModel() {
-    private val TAG = "MainViewModel"
 
+    private val TAG = "MainViewModel"
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps.asStateFlow()
-    var updateStatus = mutableStateOf(UpdateStatus.NO_UPDATE)
+    var updateState = mutableStateOf<UpdateState>(UpdateState.NoUpdate)
     fun loadInstalledApps(appList: List<AppInfo>) {
         val appList = appList.toMutableList()
         val selectedApps = localData.apps
@@ -41,7 +44,7 @@ class MainViewModel(
         }
     }
 
-    fun submitPhoneNumber(phoneNumber: String, result: (SubmitResult) -> Unit) {
+    fun submitPhoneNumber(phoneNumber: String, result: (NetworkResult) -> Unit) {
         viewModelScope.launch {
             remoteRepo.submitPhoneNumberToGoogleForm(phoneNumber)
                 .collect { result ->
@@ -50,67 +53,38 @@ class MainViewModel(
         }
     }
 
-    fun submitReport(report: Report, result: (SubmitResult) -> Unit) {
+    fun submitReport(report: Report, result: (NetworkResult) -> Unit) {
         viewModelScope.launch {
             remoteRepo.submitReportToGoogleForm(report)
                 .collect { submitResult ->
-                    Log.d(TAG, submitResult.toString())
+                    Lg.d(TAG, submitResult.toString())
                     result(submitResult)
                 }
         }
     }
 
-    fun onUpdateClicked(context: Context) {
-        when (updateStatus.value) {
-            UpdateStatus.DOWNLOADED -> {
-                context.installApk(context.updateFile())
-            }
-
-            UpdateStatus.FAILED -> {
-                Log.e(TAG, "Update download failed, retrying...")
-                handleUpdateStatus(context)
-            }
-
-            UpdateStatus.NO_UPDATE -> {
-                Log.d(TAG, "No update available")
-                handleUpdateStatus(context)
-            }
-
-            else -> {
+    fun handleUpdateStatus(){
+        viewModelScope.launch {
+            updateRepo.checkAndDownloadIfNeeded(BuildConfig.VERSION_CODE).collect {
+                updateState.value = it
+                Log.d(TAG, "Update state: $it")
             }
         }
     }
+    fun getLogFile(): File {
+        return fileRepo.getLogFile()
+    }
 
-    fun handleUpdateStatus(context: Context) {
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val updateFile = context.updateFile()
-            if (updateFile.exists()) {
-                updateStatus.value = UpdateStatus.DOWNLOADED
-                Log.d(TAG, "Update already downloaded, size: ${updateFile.length()}")
-                return@launch
-            }
-            val version = remoteRepo.getLatestVersion()
-            if (version == null || version.version <= BuildConfig.VERSION_CODE) {
-                updateStatus.value = UpdateStatus.NO_UPDATE
-                Log.d(TAG, "No update available, remote version: ${version?.version}")
-                return@launch
-            } else {
-                updateStatus.value = UpdateStatus.DOWNLOADING
-                Log.d(TAG, "New update available: ${version.version}, downloading...")
-                val res = remoteRepo.downloadFile(version.downloadUrl, updateFile)
-                if (res) {
-                    updateStatus.value = UpdateStatus.DOWNLOADED
-                    Log.d(TAG, "Update downloaded successfully,size: ${updateFile.length()}")
-                } else {
-                    updateStatus.value = UpdateStatus.FAILED
-                    Log.e(TAG, "Update download failed")
-                }
-            }
-        }
+    fun saveLevel(level: ProtectionLevel) {
+        localData.level = level
     }
 
     fun savePhoneNumber(phoneNumber: String) {
         localData.phoneNum = phoneNumber
     }
+
+    fun updateFile(): File {
+        return fileRepo.getUpdateFile()
+    }
+
 }

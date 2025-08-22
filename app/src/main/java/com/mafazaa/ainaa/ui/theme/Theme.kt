@@ -5,8 +5,9 @@ import androidx.compose.foundation.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.*
+import androidx.compose.ui.unit.*
 
-private val DarkColorScheme =darkColorScheme(
+private val DarkColorScheme = lightColorScheme(
     primary = red,
     secondary = PurpleGrey80,
     tertiary = Pink80,
@@ -46,6 +47,10 @@ fun AinaaTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                content()
+            }
+        }
     )
 }

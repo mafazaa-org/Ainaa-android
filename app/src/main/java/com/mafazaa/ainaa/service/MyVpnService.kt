@@ -1,49 +1,43 @@
-package com.mafazaa.ainaa.services
+package com.mafazaa.ainaa.service
 
-import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import com.mafazaa.ainaa.Constants
+import com.mafazaa.ainaa.Lg
 import com.mafazaa.ainaa.MainActivity
+import com.mafazaa.ainaa.data.LocalData
 import com.mafazaa.ainaa.model.ProtectionLevel
+import org.koin.java.KoinJavaComponent.inject
 
 class MyVpnService: VpnService() {
     private var vpnInterface: ParcelFileDescriptor? = null
+    private val localData : LocalData by inject(LocalData::class.java)
 
     companion object {
-        const val EXTRA_LEVEL: String= "EXTRA_LEVEL"
         private const val TAG="MyVpnService"
         const val ACTION_START = "START_VPN"
         const val ACTION_STOP = "STOP_VPN"
-        var isRunning = false
+        var isRunning = false//todo remove
     }
 
     override fun onCreate() {
         super.onCreate()
-        MyNotificationManager.createNotificationChannel(this)
         MyNotificationManager.startForegroundService(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
-            ACTION_START -> {
-                val ordinal= intent.getIntExtra(EXTRA_LEVEL, ProtectionLevel.LOW.ordinal)
-                val level = ProtectionLevel.entries.getOrNull(ordinal)!!
-                startVpn(level)
-                return START_STICKY
-            }
-
             ACTION_STOP -> {
                 stopVpn()
                 return START_NOT_STICKY
             }
-
             else -> {
-                throw IllegalArgumentException("Unknown action: ${intent?.action}")
+                val level =localData.level
+                startVpn(level)
+                return START_STICKY
             }
         }
     }
@@ -58,8 +52,7 @@ class MyVpnService: VpnService() {
         )
 
         val builder = Builder().apply {
-            addAddress(Constants.Address, 32)
-
+            addAddress(Constants.vpnAddress, 32)
             addDnsServer(protectionLevel.primaryDns)
             addDnsServer(protectionLevel.secondaryDns)
             setSession("SafeDNS")
@@ -67,7 +60,8 @@ class MyVpnService: VpnService() {
             setConfigureIntent(emptyIntent) // منع إيقاف الخدمة من الإشعار
             setMtu(1500)
         }
-        Log.d(TAG, "Starting VPN service with protection level: $protectionLevel")
+
+        Lg.d(TAG, "Starting VPN service with protection level: $protectionLevel")
 
         vpnInterface?.close()
         vpnInterface = builder.establish()
@@ -75,7 +69,7 @@ class MyVpnService: VpnService() {
     }
 
     private fun stopVpn() {
-        Log.d(TAG, "Stopping VPN service")
+        Lg.d(TAG, "Stopping VPN service")
         vpnInterface?.close()
         vpnInterface = null
         isRunning = false
@@ -85,22 +79,22 @@ class MyVpnService: VpnService() {
 
     override fun onDestroy() {
         super.onDestroy()//todo
-        Log.d(TAG, "VPN service destroyed")
+        Lg.d(TAG, "VPN service destroyed")
         if (isRunning) {
             // إعادة التشغيل التلقائي
             val intent = Intent(this, MyVpnService::class.java).apply {
                 action = ACTION_START
             }
-            startService(intent)
+
         }
     }
 
     override fun onRevoke() {
         super.onRevoke()//todo
-        Log.d(TAG, "VPN revoked")
+        Lg.d(TAG, "VPN revoked")
         val intent = Intent(this, MyVpnService::class.java).apply {
             action = ACTION_START
         }
-        startService(intent)
+
     }
 }

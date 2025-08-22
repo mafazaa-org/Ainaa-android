@@ -18,7 +18,7 @@ fun ReportLink(modifier: Modifier = Modifier, onReportClick: () -> Unit) {
 fun TowColorText(modifier: Modifier= Modifier, black: String, red: String, onClick: () -> Unit) {
     Text(
         buildAnnotatedString {
-            append(black)
+            append("$black ")
             withStyle(
                 style = SpanStyle(
                     color = com.mafazaa.ainaa.ui.theme.red,

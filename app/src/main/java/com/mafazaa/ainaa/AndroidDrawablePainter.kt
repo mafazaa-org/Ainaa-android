@@ -18,6 +18,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asAndroidColorFilter
@@ -30,7 +31,7 @@ private val MAIN_HANDLER = Handler(Looper.getMainLooper())
 class AndroidDrawablePainter(
     private val drawable: Drawable
 ) : Painter() {
-    private var invalidateTick by mutableStateOf(0)
+    private var invalidateTick by mutableIntStateOf(0)
     private var startedAnimatable = drawable is Animatable && drawable.isRunning
 
     init {

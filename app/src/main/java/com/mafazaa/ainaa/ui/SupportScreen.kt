@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
-import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.tooling.preview.*
@@ -17,6 +16,7 @@ fun SupportScreen(
     modifier: Modifier = Modifier,
     onSupportClick: () -> Unit = {},
     onJoinClick: () -> Unit = {},
+    onShareLogFile: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -97,6 +97,9 @@ fun SupportScreen(
                     Text("انضمام")
                 }
             }
+        }
+        TowColorText(black = "مشاركة ملف السجل", red = "اضغط هنا") {
+            onShareLogFile()
         }
     }
 }
