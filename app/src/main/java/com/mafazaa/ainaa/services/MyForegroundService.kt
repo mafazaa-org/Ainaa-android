@@ -7,20 +7,11 @@ import android.graphics.*
 import android.os.*
 import android.util.*
 import android.view.*
-import androidx.compose.ui.platform.*
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.ViewModelStore
-import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.setViewTreeLifecycleOwner
-import androidx.lifecycle.setViewTreeViewModelStoreOwner
-import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import com.mafazaa.ainaa.*
-import com.mafazaa.ainaa.MyApp.Companion.stopMonitoring
-import com.mafazaa.ainaa.data.*
+import com.mafazaa.ainaa.core.Constants
+import com.mafazaa.ainaa.core.MyApp
+import com.mafazaa.ainaa.core.MyApp.Companion.stopMonitoring
+import com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source.LocalData
 import com.mafazaa.ainaa.databinding.LockScreenLayoutBinding
-import com.mafazaa.ainaa.ui.*
 import kotlinx.coroutines.*
 import org.koin.java.KoinJavaComponent.inject
 

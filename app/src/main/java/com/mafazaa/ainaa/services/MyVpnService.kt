@@ -1,15 +1,13 @@
 package com.mafazaa.ainaa.services
 
-import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import com.mafazaa.ainaa.Constants
-import com.mafazaa.ainaa.MainActivity
-import com.mafazaa.ainaa.model.ProtectionLevel
+import com.mafazaa.ainaa.core.Constants
+import com.mafazaa.ainaa.ui.main.MainActivity
+import com.mafazaa.ainaa.domain.model.ProtectionLevel
 
 class MyVpnService: VpnService() {
     private var vpnInterface: ParcelFileDescriptor? = null
@@ -64,7 +62,7 @@ class MyVpnService: VpnService() {
             addDnsServer(protectionLevel.secondaryDns)
             setSession("SafeDNS")
             setBlocking(true)
-            setConfigureIntent(emptyIntent) // منع إيقاف الخدمة من الإشعار
+            setConfigureIntent(emptyIntent)
             setMtu(1500)
         }
         Log.d(TAG, "Starting VPN service with protection level: $protectionLevel")
