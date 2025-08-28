@@ -1,73 +1,70 @@
-package com.mafazaa.ainaa.core
+package com.mafazaa.ainaa
 
 import android.app.*
-import android.content.*
-import android.content.pm.*
-import android.util.*
-import androidx.lifecycle.*
-import com.mafazaa.ainaa.data.repository_impl.data_source.remote_data_source.RemoteRepo
-import com.mafazaa.ainaa.domain.di.appModule
-import com.mafazaa.ainaa.domain.model.AppInfo
-import org.koin.android.ext.android.getKoin
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.core.content.ContextCompat
+import androidx.work.*
+import com.mafazaa.ainaa.data.*
+import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.receiver.BootReceiver
+import com.mafazaa.ainaa.service.*
+import org.koin.android.ext.android.*
 import org.koin.android.ext.koin.*
 import org.koin.core.context.GlobalContext.startKoin
+import java.util.concurrent.*
 
-class MyApp : Application() {
-    private lateinit var remoteRepo: RemoteRepo
+class MyApp: Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
             androidContext(this@MyApp)
             modules(appModule)
         }
-        remoteRepo = getKoin().get<RemoteRepo>()
+        val localData: LocalData = getKoin().get()
+        val fileRepo: FileRepo = getKoin().get()
+        Lg.fileRepo = fileRepo // set the file repo for logging
         // firebaseRepo = FirebaseImpl()
         // crashlytics = FirebaseCrashlytics.getInstance()
-        isMonitoringLive.observeForever {
-            isMonitoring = it
-            Log.d("MyApp", "Monitoring is $it")
+        if (localData.lastVersion == 0) {//first run
+            isFirstTime=true
+            Lg.i(TAG, "First run, initializing local data")
+            localData.lastVersion = BuildConfig.VERSION_CODE
+        } else if (localData.lastVersion < BuildConfig.VERSION_CODE) {// app updated
+            Lg.i(
+                TAG,
+                "App updated from version ${localData.lastVersion} to ${BuildConfig.VERSION_CODE}"
+            )
+            localData.lastVersion = BuildConfig.VERSION_CODE
+            localData.downloadedVersion = 0// reset downloaded version
+        } else {
+            Lg.i(TAG, "App version is up to date: ${localData.lastVersion}")
         }
+        val filter = IntentFilter(Intent.ACTION_BOOT_COMPLETED)
+        ContextCompat.registerReceiver(this, BootReceiver(), filter,    ContextCompat.RECEIVER_EXPORTED)
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+            .setRequiresBatteryNotLow(false)
+            .setRequiresCharging(false)
+            .build()
 
+        val dailyWorkRequest =
+            PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS) // minimum interval for testing
+                .setConstraints(constraints)
+                .build()
+
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "DailyNotificationWork",
+                ExistingPeriodicWorkPolicy.KEEP,
+                dailyWorkRequest
+            )
     }
-
 
     companion object {
-
-
-        var isMonitoringLive = MutableLiveData(false)
-        var isMonitoring = false
-            private set
-
-
-        fun startMonitoring() {
-            if (isMonitoring) return
-            isMonitoringLive.postValue(true)
-        }
-
-        fun stopMonitoring() {
-            isMonitoringLive.postValue(false)
-        }
-
-
-        fun getAllApps(context: Context): List<AppInfo> {
-            val apps = mutableListOf<AppInfo>()
-            val packageManager = context.packageManager
-            val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
-            val myPackageName = context.packageName
-            for (applicationInfo in packages) {
-                val launchIntent =
-                    packageManager.getLaunchIntentForPackage(applicationInfo.packageName)
-                if (launchIntent != null &&
-                    applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 &&
-                    applicationInfo.packageName != myPackageName
-                ) { // User app
-                    val name = packageManager.getApplicationLabel(applicationInfo).toString()
-                    val icon = packageManager.getApplicationIcon(applicationInfo)
-                    apps.add(AppInfo(name, icon, applicationInfo.packageName))
-                }
-            }
-            return apps
-        }
+        private const val TAG = "MyApp"
+        var isFirstTime= false
     }
+
 
 }

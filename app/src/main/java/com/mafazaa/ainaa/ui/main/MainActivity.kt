@@ -1,10 +1,11 @@
-package com.mafazaa.ainaa.ui.main
+package com.mafazaa.ainaa
 
-import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.*
 import android.app.*
 import android.app.AppOpsManager.*
 import android.content.*
 import android.content.pm.*
+import android.net.Uri
 import android.net.VpnService.*
 import android.os.*
 import android.os.Process.*
@@ -22,100 +23,94 @@ import androidx.compose.ui.unit.*
 import androidx.core.content.*
 import androidx.navigation3.runtime.*
 import androidx.navigation3.ui.*
-import com.mafazaa.ainaa.BuildConfig
-import com.mafazaa.ainaa.core.Constants.joinUrl
-import com.mafazaa.ainaa.core.Constants.supportUrl
-import com.mafazaa.ainaa.core.MyApp.Companion.getAllApps
-import com.mafazaa.ainaa.core.MyApp.Companion.startMonitoring
-import com.mafazaa.ainaa.domain.model.PermissionState
+import com.mafazaa.ainaa.Constants.joinUrl
+import com.mafazaa.ainaa.Constants.supportUrl
+import com.mafazaa.ainaa.MyApp.Companion.getAllApps
+import com.mafazaa.ainaa.MyApp.Companion.startMonitoring
 import com.mafazaa.ainaa.data.*
-import com.mafazaa.ainaa.data.repository_impl.view_models.MainViewModel
-import com.mafazaa.ainaa.data.repository_impl.view_models.state.SubmitResult
-import com.mafazaa.ainaa.domain.model.AppInfo
-import com.mafazaa.ainaa.domain.model.ProtectionLevel
-import com.mafazaa.ainaa.core.openUrl
-import com.mafazaa.ainaa.core.requestDrawOverlaysPermission
-import com.mafazaa.ainaa.core.requestUsageStatsPermission
-import com.mafazaa.ainaa.core.requestVpnPermission
+import com.mafazaa.ainaa.model.*
 import com.mafazaa.ainaa.services.*
 import com.mafazaa.ainaa.ui.*
-import com.mafazaa.ainaa.ui.components.BlockAppDialog
-import com.mafazaa.ainaa.ui.components.BottomBar
-import com.mafazaa.ainaa.ui.components.ConfirmDeleteDialog
-import com.mafazaa.ainaa.ui.components.EnableProtectionDialog
-import com.mafazaa.ainaa.ui.components.EnableProtectionScreen
-import com.mafazaa.ainaa.ui.components.PermissionDialog
-import com.mafazaa.ainaa.ui.components.ProtectionActivatedScreen
-import com.mafazaa.ainaa.ui.components.ReportProblemDialog
-import com.mafazaa.ainaa.ui.components.Screen
-import com.mafazaa.ainaa.ui.components.SupportScreen
-import com.mafazaa.ainaa.ui.components.TopBar
 import com.mafazaa.ainaa.ui.theme.*
 import org.koin.androidx.viewmodel.ext.android.*
-import kotlin.jvm.java
 
-class MainActivity : ComponentActivity() {
+class MainActivity: ComponentActivity() {
     private var permissionState by mutableStateOf(PermissionState.Vpn)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val viewModel: MainViewModel = getViewModel()
         viewModel.loadInstalledApps(getAllApps(this))
-        viewModel.handleUpdateStatus(this)
-
+        Lg.i(TAG, "Opening app")
+        //viewModel.handleUpdateStatus(this)
         refreshPermissionState()
         setContent {
             AinaaTheme {
-                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                    val backStack = remember {
-                        mutableStateListOf(
-                            if (!MyVpnService.isRunning) Screen.EnableProtection
-                            else Screen.ProtectionActivated
-                        )
-                    }
-                    val context = LocalContext.current
-                    var selectedApp by remember { mutableStateOf<AppInfo?>(null) }
-                    val apps = viewModel.apps.collectAsState().value
+                val snackbarHostState = remember { SnackbarHostState() }
+                val backStack = remember {
+                    mutableStateListOf(
+                        if (!MyVpnService.isRunning) Screen.EnableProtection
+                        else Screen.ProtectionActivated
+                    )
+                }
+                val context = LocalContext.current
+                var selectedApp by remember { mutableStateOf<AppInfo?>(null) }
+                val apps = viewModel.apps.collectAsState().value
 
-                    var showReportDialog by remember { mutableStateOf(false) }
-                    if (showReportDialog) {
-                        ReportProblemDialog(
-                            onClose = { showReportDialog = false },
-                            onSubmit = { report ->
-                                viewModel.submitReport(report) {
-                                    when (it) {
-                                        SubmitResult.Success -> {
-                                            Toast.makeText(
-                                                context,
-                                                "تم إرسال التقرير بنجاح",
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
-
-                                        is SubmitResult.Error -> {
-                                            Toast.makeText(
-                                                context,
-                                                "فشل في أرسال التقرير : ${it.message}",
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
-
-                                        else -> {}
+                var showReportDialog by remember { mutableStateOf(false) }
+                if (showReportDialog) {
+                    ReportProblemDialog(
+                        onClose = { showReportDialog = false },
+                        onSubmit = { report ->
+                            viewModel.submitReport(report) {
+                                when (it) {
+                                    NetworkResult.Success -> {
+                                        Toast.makeText(
+                                            context,
+                                            "تم إرسال التقرير بنجاح",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                     }
+
+                                    is NetworkResult.Error -> {
+                                        Toast.makeText(
+                                            context,
+                                            "فشل في أرسال التقرير : ${it.message}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+
+                                    else -> {}
                                 }
-                                showReportDialog = false
-                            })
-                    }
-                    var showPermissionDialog by remember { mutableStateOf(false) }
-                    if (showPermissionDialog) {
-                        PermissionDialog(
-                            permissionState = permissionState,
-                            onDismiss = { showPermissionDialog = false },
-                            onClick = {
-                                grantPermission()
-                                showPermissionDialog = false
                             }
-                        )
-                    }
+                            showReportDialog = false
+                        })
+                }
+                var firstTimeDialog by remember { mutableStateOf(MyApp.isFirstTime) }
+                if (firstTimeDialog) {
+                    OkDialog(
+                        title = "هذا إصدار تجريبي",
+                        message = """
+يرجى ملاحظة أن هذا التطبيق في مرحلة التجربة وقد يحتوي على بعض المشاكل.
+برجاء إبلاغنا عن أي مشكلة تحدث معك، و انتظار الاصدارات القادمة المحسنة بإذن الله.
+""".trimIndent(),
+                        onDismiss = {
+                            firstTimeDialog = false
+                            MyApp.isFirstTime = false
+                        }
+                    )
+
+                }
+                var permissionState by remember { mutableStateOf<PermissionState?>(null) }
+                if (permissionState != null) {
+                    PermissionDialog(
+                        permissionState = permissionState!!,
+                        onDismiss = { permissionState = null },
+                        onClick = {
+                            grantPermission(permissionState!!)
+                            permissionState = null
+                        }
+                    )
+                }
 
                     var showBlockAppsDialog by remember { mutableStateOf(false) }
                     if (showBlockAppsDialog) {
@@ -153,11 +148,9 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }, bottomBar = {
-                            BottomBar(
-                                modifier = Modifier,
+                            BottomBar(modifier = Modifier,
                                 appVersion = BuildConfig.VERSION_CODE,
-                                androidVersion = Build.VERSION.RELEASE
-                            ) {
+                                androidVersion = Build.VERSION.RELEASE) {
                                 if (MyVpnService.isRunning) {
                                     backStack.add(Screen.ProtectionActivated)
                                 }
@@ -180,18 +173,23 @@ class MainActivity : ComponentActivity() {
                                             onSupportClick = { backStack.add(Screen.Support) },
                                             onBlockAppClick = { showBlockAppsDialog = true },
                                             onReportClick = { showReportDialog = true },
-                                            onUpdateClick = {
-                                                viewModel.onUpdateClicked(this@MainActivity)
-                                            }, updateStatus = viewModel.updateStatus.value
+                                            onUpdateClick= {
+                                               viewModel.onUpdateClicked(this@MainActivity)
+                                            }
+                                            , updateStatus = viewModel.updateStatus.value
                                         )
 
-                                    }
+                                }
 
-                                    Screen.Support -> NavEntry(key) {
-                                        SupportScreen(onSupportClick = {
+                                Screen.Support -> NavEntry(key) {
+                                    SupportScreen(
+                                        onSupportClick = {
                                             openUrl(supportUrl)
                                         }, onJoinClick = {
                                             openUrl(joinUrl)
+                                        },
+                                        onShareLogFile = {
+                                            this@MainActivity.shareLogFile(viewModel.getLogFile())
                                         })
                                     }
 
@@ -221,7 +219,6 @@ class MainActivity : ComponentActivity() {
                                                                     phoneNumber
                                                                 )
                                                                 startVpnService(selectedLevel)
-
                                                                 startService(
                                                                     Intent(
                                                                         this,
@@ -233,35 +230,37 @@ class MainActivity : ComponentActivity() {
                                                                 backStack.remove(Screen.EnableProtection)
                                                             }
 
-                                                            is SubmitResult.Error -> {
-                                                                Toast.makeText(
-                                                                    context,
-                                                                    "فشل في أرسال البيانات : ${it.message}",
-                                                                    Toast.LENGTH_LONG
-                                                                ).show()
-                                                            }
-
-                                                            else -> {}
+                                                        is NetworkResult.Error -> {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "فشل في أرسال البيانات : ${it.message}",
+                                                                Toast.LENGTH_LONG
+                                                            ).show()
                                                         }
-                                                    })
-                                                },
-                                                onDismiss = { showConfirmationDialog = false }
-                                            )
-                                        }
-                                        EnableProtectionScreen(
-                                            report = { showReportDialog = true },
-                                            enableProtection = { level: ProtectionLevel, phone: String ->
-                                                selectedLevel = level
-                                                phoneNumber = phone
-                                                if (permissionState != PermissionState.Granted) {
-                                                    showPermissionDialog = true
-                                                } else {
-                                                    showConfirmationDialog = true
-                                                }
+
+                                                        else -> {}
+                                                    }
+                                                })
                                             },
-                                            selectedLevel = selectedLevel,
+                                            onDismiss = { showConfirmationDialog = false }
                                         )
                                     }
+                                    EnableProtectionScreen(
+                                        report = { showReportDialog = true },
+                                        enableProtection = { level: ProtectionLevel, phone: String ->
+                                            selectedLevel = level
+                                            phoneNumber = phone
+                                            if (!vpnPermission) {
+                                                permissionState = PermissionState.Vpn
+                                            } else if (!notificationPermission) {
+                                                permissionState = PermissionState.Notification
+                                            } else {
+                                                showConfirmationDialog = true
+                                            }
+                                        },
+                                        selectedLevel = selectedLevel,
+                                    )
+                                }
 
                                 }
                             })
@@ -273,27 +272,28 @@ class MainActivity : ComponentActivity() {
 
     private fun refreshPermissionState() {
         val appOps = getSystemService(APP_OPS_SERVICE) as AppOpsManager
+        if (!notificationPermission) {
+            notificationPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    ContextCompat.checkSelfPermission(
+                        this,
+                        POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+        }
+        if (!vpnPermission) {
+            vpnPermission = hasVpnPermission()
+        }
+        if (!overlayPermission) {
+            overlayPermission = canDrawOverlays(this)
+        }
+        if (!usageStatsPermission) {
+            usageStatsPermission = appOps.checkOpNoThrow(
+                OPSTR_GET_USAGE_STATS,
+                myUid(),
+                this.packageName
+            ) == MODE_ALLOWED
+        }
 
-        permissionState =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                ContextCompat.checkSelfPermission(this, POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                PermissionState.Notification
-            } else if (prepare(this) != null) {
-                PermissionState.Vpn
-            } else if (!canDrawOverlays(this)) {
-                PermissionState.Overlay
-            } else if (appOps.checkOpNoThrow(
-                    OPSTR_GET_USAGE_STATS,
-                    myUid(),
-                    this.packageName
-                ) != MODE_ALLOWED
-            ) {
-                PermissionState.UsageStats
-            } else {
-                PermissionState.Granted
-            }
+
     }
 
 
@@ -316,12 +316,15 @@ class MainActivity : ComponentActivity() {
 
         ContextCompat.startForegroundService(this, intent)
         MyVpnService.isRunning = true
+
         // شغل KeepAlive Service
+
         val keepAliveIntent = Intent(this, VpnKeepAliveService::class.java)
         ContextCompat.startForegroundService(this, keepAliveIntent)
     }
 
-    private fun grantPermission() {
+
+    private fun grantPermission(permissionState: PermissionState) {
         when (permissionState) {
             PermissionState.Notification -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -336,4 +339,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    companion object {
+        const val TAG = "MainActivity"
+    }
+
+
 }
+
+fun Context.hasVpnPermission(): Boolean = prepare(this) == null
+
+

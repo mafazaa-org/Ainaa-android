@@ -13,8 +13,6 @@ import com.mafazaa.ainaa.R
 import com.mafazaa.ainaa.ui.theme.*
 
 @Composable fun TopBar(
-    blockSpecificApp: () -> Unit,
-    canBlock: Boolean,
     supportUs: () -> Unit,
     home: () -> Unit,
 ) {
@@ -23,25 +21,13 @@ import com.mafazaa.ainaa.ui.theme.*
             .fillMaxWidth()
             .padding(start = 4.dp, top = 24.dp, end = 4.dp),
     ) {
-        if (canBlock) {
-            Text(
-                text = "حجب تطبيق معين",
-                color = red,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .offset(y = (-2).dp)
-                    .clickable { blockSpecificApp() },
-                style = LocalTextStyle.current.copy(textDecoration = TextDecoration.Underline),
-                lineHeight = 17.sp
-            )
-        } else {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .offset(y = (-2).dp)
-            ) {}
 
-        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .offset(y = (-2).dp)
+        ) {}
+
 
         Image(
             painter = painterResource(id = R.drawable.red), // Replace with actual drawable
@@ -67,6 +53,6 @@ import com.mafazaa.ainaa.ui.theme.*
 @Preview
 @Composable
 fun TopBarPreview() {
-    TopBar(blockSpecificApp = {}, supportUs = {}, home = {}, canBlock = false)
+    TopBar( supportUs = {}, home = {})
 }
 

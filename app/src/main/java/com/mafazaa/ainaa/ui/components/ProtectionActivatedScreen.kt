@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.ui.components
+package com.mafazaa.ainaa.ui
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -9,9 +9,9 @@ import androidx.compose.ui.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
-import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
-import com.mafazaa.ainaa.domain.model.UpdateStatus
+import androidx.compose.ui.window.*
+import com.mafazaa.ainaa.model.*
 import com.mafazaa.ainaa.ui.theme.*
 
 @Composable
@@ -19,9 +19,11 @@ fun ProtectionActivatedScreen(
     onSupportClick: () -> Unit,
     onBlockAppClick: () -> Unit,
     onReportClick: () -> Unit,
-    onUpdateClick: () -> Unit = { /* Default no-op */ },
-    updateStatus: UpdateStatus = UpdateStatus.NO_UPDATE,
-) {
+    onConfirmProtectionClick: () -> Unit,
+    onUpdateClick: (updateState: UpdateState) -> Unit = { /* Default no-op */ },
+    updateState: UpdateState = UpdateState.NoUpdate,
+
+    ) {
     Column(
         modifier = Modifier
             .padding(24.dp)
@@ -37,12 +39,18 @@ fun ProtectionActivatedScreen(
             textAlign = TextAlign.Center
         )
 
-        // Subtitle
+// Subtitle
         Text(
-            text = "يمكنك أيضاً حجب تطبيق معين: اضغط الزر في الأسفل",
+            text = "كيف أتأكد ان الحماية تعمل؟",
             fontSize = 14.sp,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+            color = red,
+            textDecoration = TextDecoration.Underline,
+            modifier = Modifier
+                .padding(top = 8.dp, bottom = 24.dp)
+                .clickable {
+                    onConfirmProtectionClick()
+                }
         )
 
         // Buttons row
@@ -78,25 +86,16 @@ fun ProtectionActivatedScreen(
         }
         ReportLink(onReportClick = onReportClick)
         Spacer(modifier = Modifier.height(16.dp))
-        val ( black,red) = when (updateStatus) {
-            UpdateStatus.NO_UPDATE -> Pair("لا يوجد تحديث متاح","")
-            UpdateStatus.DOWNLOADING -> Pair( "جاري تحميل التحديث... الرجاء الانتظار","")
-            UpdateStatus.FAILED -> Pair("فشل تحميل التحديث", "حاول مرة أخرى")
-            UpdateStatus.DOWNLOADED -> Pair("تم تحميل التحديث", "تثبيت")
+        val (black, red) = when (updateState) {
+            UpdateState.NoUpdate -> Pair("لا يوجد تحديث متاح", "اضغط للتحقق")
+            UpdateState.Checking -> Pair("جاري التحقق من وجود تحديثات", "")
+            is UpdateState.Downloading -> Pair("جاري تحميل التحديث... الرجاء الانتظار", "")
+            is UpdateState.Failed -> Pair("فشل تحميل التحديث", "حاول مرة أخرى")
+            UpdateState.Downloaded -> Pair("تم تحميل التحديث", "تثبيت")
         }
-        TowColorText(black = black, red = red, onClick = onUpdateClick)
 
+        TowColorText(black = black, red = red, onClick = { onUpdateClick(updateState) })
 
     }
-}
-
-@Preview
-@Composable
-fun ProtectionActivatedScreenPreview() {
-    ProtectionActivatedScreen(
-        onSupportClick = {},
-        onBlockAppClick = {},
-        onReportClick = {}
-    )
 }
 

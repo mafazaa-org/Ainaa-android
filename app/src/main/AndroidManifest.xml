@@ -8,28 +8,39 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="com.htc.permission.QUICKBOOT_POWERON" />
 
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
+
     <application
+        android:name="com.mafazaa.ainaa.MyApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name="com.mafazaa.ainaa.core.MyApp"
+        android:layoutDirection="rtl"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ainaa"
-        android:layoutDirection="rtl"
         tools:targetApi="31">
-
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
         <service
-            android:name="com.mafazaa.ainaa.services.MyVpnService"
+            android:name="com.mafazaa.ainaa.service.MyVpnService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
             android:permission="android.permission.BIND_VPN_SERVICE"
@@ -39,17 +50,13 @@
             </intent-filter>
         </service>
         <service
-            android:name=".services.MyForegroundService"
+            android:name=".service.MonitorService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
-        <service
-            android:name=".services.VpnKeepAliveService"
-            android:enabled="true"
-            android:exported="false" />
 
         <activity
-            android:name="com.mafazaa.ainaa.ui.main.MainActivity"
+            android:name="com.mafazaa.ainaa.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -57,6 +64,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:directBootAware="false"
+            android:enabled="true"
+            android:exported="true"
+
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <!--For HTC devices-->
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWEROFF" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

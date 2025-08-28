@@ -16,6 +16,7 @@ fun SupportScreen(
     modifier: Modifier = Modifier,
     onSupportClick: () -> Unit = {},
     onJoinClick: () -> Unit = {},
+    onShareLogFile: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -96,6 +97,9 @@ fun SupportScreen(
                     Text("انضمام")
                 }
             }
+        }
+        TowColorText(black = "مشاركة ملف السجل", red = "اضغط هنا") {
+            onShareLogFile()
         }
     }
 }

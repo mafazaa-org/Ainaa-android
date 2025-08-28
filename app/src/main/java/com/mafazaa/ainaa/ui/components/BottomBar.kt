@@ -18,22 +18,20 @@ import com.mafazaa.ainaa.ui.theme.*
 fun BottomBar(
     modifier: Modifier = Modifier,
     androidVersion: String,
-    appVersion: Int,
+    appVersion: String,
     home: () -> Unit,
 ) {
     Box(
         modifier.fillMaxWidth(),
     ) {
         Text(
-            text = "Android:$androidVersion\nApp Version:$appVersion",
+            text = "Android:$androidVersion",
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(start = 8.dp)
-                ,
+                .align(Alignment.CenterEnd)
+                .padding(end = 8.dp),
             color = red.copy(alpha = .7f),
             style = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold),
             fontSize = 10.sp
-
         )
         Image(
             painter = painterResource(id = R.drawable.logo_red),
@@ -44,6 +42,15 @@ fun BottomBar(
                 .clickable { home() }
                 .fillMaxWidth(.29f),//todo
         )
+        Text(
+            text = appVersion,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 8.dp),
+            color = red.copy(alpha = .7f),
+            style = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold),
+            fontSize = 10.sp
+        )
     }
 
 
@@ -52,5 +59,7 @@ fun BottomBar(
 @Preview(showSystemUi = true)
 @Composable
 fun BottomBarPreview(modifier: Modifier = Modifier) {
-    BottomBar(modifier, "14", 3) {}
+    Box (Modifier.fillMaxSize()){
+        BottomBar(modifier.align(Alignment.BottomCenter), "14", "v0.0.0") {}
+    }
 }

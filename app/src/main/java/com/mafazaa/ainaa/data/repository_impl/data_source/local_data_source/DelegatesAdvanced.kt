@@ -1,6 +1,7 @@
 package com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source
 
 import android.content.*
+import com.mafazaa.ainaa.model.ProtectionLevel
 import kotlin.properties.*
 import kotlin.reflect.*
 
@@ -22,6 +23,13 @@ class SharedPreferenceDelegates(private val prefs: SharedPreferences) {
 
     fun long(default: Long = 0L, key: String? = null): ReadWriteProperty<Any, Long> =
         create(default, key, prefs::getLong, prefs.edit()::putLong)
+
+    fun protectionLevel(
+        default: ProtectionLevel = ProtectionLevel.LOW,
+        key: String? = null,
+    ): ReadWriteProperty<Any, ProtectionLevel> =
+        create(default, key, { k, d -> ProtectionLevel.entries[prefs.getInt(k, d.ordinal)] },
+            { k, v -> prefs.edit().putInt(k, v.ordinal) })
 
     fun string(default: String = "", key: String? = null): ReadWriteProperty<Any, String> =
         create(default, key, { k, d -> prefs.getString(k, d) as String }, prefs.edit()::putString)

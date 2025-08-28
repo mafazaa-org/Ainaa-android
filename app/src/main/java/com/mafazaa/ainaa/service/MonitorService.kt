@@ -7,52 +7,55 @@ import android.graphics.*
 import android.os.*
 import android.util.*
 import android.view.*
-import com.mafazaa.ainaa.core.Constants
-import com.mafazaa.ainaa.core.MyApp
-import com.mafazaa.ainaa.core.MyApp.Companion.stopMonitoring
-import com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source.LocalData
+import androidx.compose.ui.platform.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.mafazaa.ainaa.*
+import com.mafazaa.ainaa.MyApp.Companion.stopMonitoring
+import com.mafazaa.ainaa.data.*
 import com.mafazaa.ainaa.databinding.LockScreenLayoutBinding
+import com.mafazaa.ainaa.ui.*
 import kotlinx.coroutines.*
 import org.koin.java.KoinJavaComponent.inject
 
-class MyForegroundService: Service() {
+class MonitorService: Service() {
     private val serviceScope = CoroutineScope(Dispatchers.Default + Job())
     private val handler = Handler(Looper.getMainLooper())
     lateinit var usageStatsManager: UsageStatsManager
     private val localData: LocalData by inject(LocalData::class.java)
     private var lockOverlay: View? = null
+    private val checkRunnable = MyRunnable()
 
     override fun onCreate() {
         super.onCreate()
         MyNotificationManager.createNotificationChannel(this)
         MyNotificationManager.startForegroundService(this)
         usageStatsManager = getSystemService(USAGE_STATS_SERVICE) as UsageStatsManager
-        /*        serviceScope.launch {
-                    val child = ChildPreferences.getChild(this@MyForegroundService)
-                    if (child == null) {
-                        MyApp.crashlytics.log("Child is null")
-                        return@launch
-                    }
-
-                    serviceScope.launch {
-                        listenToPause(child.id.toString())
-                        listenToConfig(child.id.toString())
-                        if (ChildPreferences.getChild(this@MyForegroundService)?.isControlled == true) {
-                            startMonitoring()
-                        } else {
-                            stopMonitoring()
-                        }
-                    }
-                }*/
-        MyApp.isMonitoringLive.observeForever {//todo lifecycle
-            if (it) {
-                handler.post(checkRunnable)
-            } else {
-                handler.removeCallbacks(checkRunnable)
-                closeHomeOverlay()
-            }
+        startListeningToConfig()
+        serviceScope.launch {
+            isRunning
         }
+        Lg.d(TAG, "Monitor Service created")
 
+//        isMonitoringLive.observeForever {//todo lifecycle
+//            if (it) {
+//                handler.post(checkRunnable)
+//            } else {
+//                handler.removeCallbacks(checkRunnable)
+//                closeHomeOverlay()
+//            }
+//        }
+
+    }
+
+    private fun startListeningToConfig() {
+        //for future use
     }
 
     private fun closeHomeOverlay() {
@@ -64,12 +67,32 @@ class MyForegroundService: Service() {
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when (intent?.action) {
+            ACTION_START -> {
+                isRunning.value = true
+                serviceScope.launch {
+                    handler.post(checkRunnable)
+                }
+                Lg.d(TAG , "Monitoring started")
+            }
+            ACTION_STOP -> {
+                isRunning.value = false
+                serviceScope.launch {
+                    handler.removeCallbacks(checkRunnable)
+                    closeHomeOverlay()
+                }
+                Lg.d(TAG, "Monitoring stopped")
+            }
+            else -> {
+                Lg.e(TAG, "Unknown action: ${intent?.action}")
+            }
+        }
         return START_STICKY
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        stopMonitoring()
+        isRunning.value= false
         serviceScope.cancel()
 
     }
@@ -80,7 +103,7 @@ class MyForegroundService: Service() {
 
     private fun getForegroundApp(): String? {
         val endTime = System.currentTimeMillis()
-        val startTime = endTime - 1000 * 15 // Increased time window to 10 seconds
+        val startTime = endTime - 1000 * 15 // todo check
         val usageStats = usageStatsManager.queryUsageStats(
             UsageStatsManager.INTERVAL_DAILY, startTime, endTime
         )
@@ -92,7 +115,7 @@ class MyForegroundService: Service() {
     inner class MyRunnable: Runnable {
         override fun run() {
             serviceScope.launch {
-                while (MyApp.isMonitoring) {
+                while (isRunning.value) {
                     checkAndRedirect()
                 }
             }
@@ -103,7 +126,7 @@ class MyForegroundService: Service() {
         if (lockOverlay != null) {
             return
         }
-        val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -133,21 +156,25 @@ class MyForegroundService: Service() {
     private suspend fun checkAndRedirect() {
         val currentApp = getForegroundApp()
         val blockedApp = localData.apps
-        if (currentApp !in blockedApp || currentApp == null || !MyApp.isMonitoring) {
-            Log.d("MyForegroundService", "Allowed app: $currentApp")
-        } else {
+        if (currentApp in blockedApp && currentApp != null && isRunning.value) {
             serviceScope.launch (Dispatchers.Main){
-            showLockScreen()  }
-            Log.d(
-                "MyForegroundService",
+                showLockScreen()  }
+            Lg.d(
+                TAG,
                 "Blocked app: $currentApp "
             )
+        } else {
+            Log.d(TAG, "Allowed app: $currentApp")
         }
         delay(Constants.CHECK_INTERVAL)
     }
+    companion object {
+        const val TAG = "MyForegroundService"
+        var isRunning = MutableStateFlow(false)
+        const val ACTION_START ="START"
+        const val ACTION_STOP = "STOP"
 
-    private val checkRunnable = MyRunnable()
-
+    }
 
 }
 /*

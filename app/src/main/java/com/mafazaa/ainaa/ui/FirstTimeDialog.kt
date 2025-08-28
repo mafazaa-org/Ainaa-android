@@ -7,22 +7,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
-import com.mafazaa.ainaa.*
 
 @Composable
-fun PermissionDialog(
+fun FirstTimeDialog(
+    modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
-    onClick: () -> Unit,
-    permissionState: PermissionState,
 ) {
-    val (permissionTitle, permissionDescription) = when (permissionState) {
-        PermissionState.Notification -> "إذن الإشعارات" to "يحتاج هذا التطبيق إلى إذن الإشعارات."
-        PermissionState.UsageStats -> "إذن إحصائيات الاستخدام" to "يحتاج هذا التطبيق إلى إذن إحصائيات الاستخدام لمراقبة التطبيقات التي تعمل."
-        PermissionState.Overlay -> "إذن العرض فوق التطبيقات" to "يحتاج هذا التطبيق إلى إذن العرض فوق التطبيقات للظهور فوق التطبيقات الأخرى."
-        PermissionState.Vpn -> "إذن VPN" to "يحتاج هذا التطبيق إلى إذن VPN لإنشاء اتصال آمن."
-        PermissionState.Granted -> "" to ""
-    }
 
+}
+@Composable
+fun OkDialog(
+    modifier: Modifier = Modifier,
+    title: String,
+    message: String,
+    onDismiss: () -> Unit,
+    okText: String = "موافق",
+) {
     Dialog(
         onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
@@ -33,13 +33,13 @@ fun PermissionDialog(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = permissionTitle,
+                    text = title,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = permissionDescription,
+                    text = message,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -48,16 +48,11 @@ fun PermissionDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("إلغاء")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(onClick = onClick) {
-                        Text("موافق")
+                    Button(onClick = onDismiss) {
+                        Text(okText)
                     }
                 }
             }
         }
     }
 }
-
