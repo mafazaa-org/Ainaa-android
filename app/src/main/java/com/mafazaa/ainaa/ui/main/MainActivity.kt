@@ -52,8 +52,9 @@ import com.mafazaa.ainaa.ui.components.SupportScreen
 import com.mafazaa.ainaa.ui.components.TopBar
 import com.mafazaa.ainaa.ui.theme.*
 import org.koin.androidx.viewmodel.ext.android.*
+import kotlin.jvm.java
 
-class MainActivity: ComponentActivity() {
+class MainActivity : ComponentActivity() {
     private var permissionState by mutableStateOf(PermissionState.Vpn)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -220,6 +221,7 @@ class MainActivity: ComponentActivity() {
                                                                     phoneNumber
                                                                 )
                                                                 startVpnService(selectedLevel)
+
                                                                 startService(
                                                                     Intent(
                                                                         this,
@@ -314,11 +316,10 @@ class MainActivity: ComponentActivity() {
 
         ContextCompat.startForegroundService(this, intent)
         MyVpnService.isRunning = true
+        // شغل KeepAlive Service
+        val keepAliveIntent = Intent(this, VpnKeepAliveService::class.java)
+        ContextCompat.startForegroundService(this, keepAliveIntent)
     }
-
-
-
-
 
     private fun grantPermission() {
         when (permissionState) {
@@ -335,7 +336,4 @@ class MainActivity: ComponentActivity() {
         }
     }
 
-
 }
-
-

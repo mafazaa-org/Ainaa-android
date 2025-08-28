@@ -22,6 +22,7 @@ class KtorRepo: RemoteRepo {
     val googleFormUrl =
         "https://docs.google.com/forms/d/e/1FAIpQLSdLizpsP03ZJ1epl1DfW41XZsH_Ul83HU_ZWEidOla_En-s5A/formResponse"
     val phoneNumberEntryId = "entry.1388739102" // Your Entry ID
+
     // Initialize Ktor client
     val client = HttpClient(Android) {
         install(Logging) {
@@ -122,4 +123,3 @@ suspend fun main() {
     val repo = KtorRepo()
     print(repo.getLatestVersion())
 }
-

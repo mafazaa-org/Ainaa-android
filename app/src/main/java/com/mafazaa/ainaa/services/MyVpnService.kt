@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.mafazaa.ainaa.core.Constants
 import com.mafazaa.ainaa.ui.main.MainActivity
 import com.mafazaa.ainaa.domain.model.ProtectionLevel
@@ -35,10 +36,10 @@ class MyVpnService: VpnService() {
                 return START_STICKY
             }
 
-            ACTION_STOP -> {
-                stopVpn()
-                return START_NOT_STICKY
-            }
+//            ACTION_STOP -> {
+//                stopVpn()
+//                return START_NOT_STICKY
+//            }
 
             else -> {
                 throw IllegalArgumentException("Unknown action: ${intent?.action}")
@@ -46,18 +47,15 @@ class MyVpnService: VpnService() {
         }
     }
 
-
     private fun startVpn(protectionLevel: ProtectionLevel) {
         val emptyIntent = PendingIntent.getActivity(
             this,
             0,
             Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = Builder().apply {
             addAddress(Constants.Address, 32)
-
             addDnsServer(protectionLevel.primaryDns)
             addDnsServer(protectionLevel.secondaryDns)
             setSession("SafeDNS")
@@ -73,32 +71,42 @@ class MyVpnService: VpnService() {
     }
 
     private fun stopVpn() {
-        Log.d(TAG, "Stopping VPN service")
         vpnInterface?.close()
         vpnInterface = null
-        isRunning = false
-        stopForeground(true)
-        stopSelf()
+
+
+
+        val intent = Intent("VPN_STATUS").apply {
+            putExtra("status", "DISCONNECTED")
+        }
+        sendBroadcast(intent)
+
     }
+
+
 
     override fun onDestroy() {
-        super.onDestroy()//todo
-        Log.d(TAG, "VPN service destroyed")
+        super.onDestroy()
+        Log.d(TAG, "VPN service destroyed, restarting to keep notification")
         if (isRunning) {
-            // إعادة التشغيل التلقائي
             val intent = Intent(this, MyVpnService::class.java).apply {
                 action = ACTION_START
+                putExtra(EXTRA_LEVEL, ProtectionLevel.LOW.ordinal)
             }
-            startService(intent)
+            ContextCompat.startForegroundService(this, intent)
         }
     }
 
+
+
     override fun onRevoke() {
-        super.onRevoke()//todo
-        Log.d(TAG, "VPN revoked")
-        val intent = Intent(this, MyVpnService::class.java).apply {
-            action = ACTION_START
+        super.onRevoke()
+        isRunning = false
+
+        val intent = Intent("VPN_STATUS").apply {
+            putExtra("status", "DISCONNECTED")
         }
-        startService(intent)
+        sendBroadcast(intent)
     }
+
 }
