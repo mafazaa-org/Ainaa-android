@@ -1,8 +1,8 @@
-package com.mafazaa.ainaa.model.repo
+package com.mafazaa.ainaa.domain.model.repo
 
 import com.mafazaa.ainaa.data.NetworkResult
-import com.mafazaa.ainaa.model.Report
-import com.mafazaa.ainaa.model.Version
+import com.mafazaa.ainaa.domain.model.Report
+import com.mafazaa.ainaa.domain.model.Version
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 

@@ -1,6 +1,6 @@
 package com.mafazaa.ainaa.data
 
-import com.mafazaa.ainaa.model.FileRepo
+import com.mafazaa.ainaa.domain.model.repo.FileRepo
 import java.io.File
 
 object FakeFileRepo: FileRepo {

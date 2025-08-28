@@ -1,11 +1,13 @@
 package com.mafazaa.ainaa.receiver
 
-import android.content.*
-import android.util.Log
-import androidx.core.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import androidx.core.content.ContextCompat
 import com.mafazaa.ainaa.Lg
-import com.mafazaa.ainaa.data.*
-import com.mafazaa.ainaa.service.*
+import com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source.LocalData
+import com.mafazaa.ainaa.service.MonitorService
+import com.mafazaa.ainaa.service.MyVpnService
 import org.koin.java.KoinJavaComponent.inject
 
 class BootReceiver: BroadcastReceiver() {

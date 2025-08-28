@@ -1,13 +1,27 @@
-package com.mafazaa.ainaa
+package com.mafazaa.ainaa.data.repository_impl.view_models
 
-import android.content.*
-import android.util.*
-import androidx.compose.runtime.*
-import androidx.lifecycle.*
-import com.mafazaa.ainaa.data.*
-import com.mafazaa.ainaa.model.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.mafazaa.ainaa.BuildConfig
+import com.mafazaa.ainaa.Lg
+import com.mafazaa.ainaa.data.NetworkResult
+import com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source.LocalData
+import com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source.add
+import com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source.remove
+import com.mafazaa.ainaa.domain.model.AppInfo
+import com.mafazaa.ainaa.domain.model.ProtectionLevel
+import com.mafazaa.ainaa.domain.model.Report
+import com.mafazaa.ainaa.domain.model.repo.FileRepo
+import com.mafazaa.ainaa.domain.model.UpdateState
+import com.mafazaa.ainaa.domain.model.repo.RemoteRepo
+import com.mafazaa.ainaa.domain.model.repo.UpdateRepo
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.io.File
 
 class MainViewModel(
     private val remoteRepo: RemoteRepo,
@@ -17,7 +31,6 @@ class MainViewModel(
 ): ViewModel() {
 
     private val TAG = "MainViewModel"
-
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps.asStateFlow()
     var updateState = mutableStateOf<UpdateState>(UpdateState.NoUpdate)

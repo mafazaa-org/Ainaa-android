@@ -1,7 +1,7 @@
 package com.mafazaa.ainaa.data
 
 import android.content.*
-import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.domain.model.repo.FileRepo
 import java.io.*
 
 class RealFileRepo(val context: Context): FileRepo {

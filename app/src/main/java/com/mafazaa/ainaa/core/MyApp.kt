@@ -1,18 +1,25 @@
-package com.mafazaa.ainaa
+package com.mafazaa.ainaa.core
 
-import android.app.*
+import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
-import androidx.work.*
-import com.mafazaa.ainaa.data.*
-import com.mafazaa.ainaa.model.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.mafazaa.ainaa.BuildConfig
+import com.mafazaa.ainaa.Lg
+import com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source.LocalData
+import com.mafazaa.ainaa.domain.di.appModule
+import com.mafazaa.ainaa.domain.model.repo.FileRepo
 import com.mafazaa.ainaa.receiver.BootReceiver
-import com.mafazaa.ainaa.service.*
-import org.koin.android.ext.android.*
-import org.koin.android.ext.koin.*
+import com.mafazaa.ainaa.service.DailyNotificationWorker
+import org.koin.android.ext.android.getKoin
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
-import java.util.concurrent.*
+import java.util.concurrent.TimeUnit
 
 class MyApp: Application() {
     override fun onCreate() {

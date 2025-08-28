@@ -11,7 +11,9 @@ import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.*
-import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.domain.model.UpdateState
+import com.mafazaa.ainaa.ui.components.ReportLink
+import com.mafazaa.ainaa.ui.components.TowColorText
 import com.mafazaa.ainaa.ui.theme.*
 
 @Composable

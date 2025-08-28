@@ -2,7 +2,7 @@ package com.mafazaa.ainaa
 
 import android.util.*
 import com.mafazaa.ainaa.data.*
-import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.domain.model.repo.FileRepo
 
 object Lg {
     var fileRepo: FileRepo = FakeFileRepo // inject real one later

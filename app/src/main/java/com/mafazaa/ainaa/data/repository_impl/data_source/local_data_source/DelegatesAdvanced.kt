@@ -1,7 +1,7 @@
 package com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source
 
 import android.content.*
-import com.mafazaa.ainaa.model.ProtectionLevel
+import com.mafazaa.ainaa.domain.model.ProtectionLevel
 import kotlin.properties.*
 import kotlin.reflect.*
 

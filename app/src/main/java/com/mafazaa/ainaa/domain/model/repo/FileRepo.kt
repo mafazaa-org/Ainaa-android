@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.model
+package com.mafazaa.ainaa.domain.model.repo
 
 import java.io.File
 

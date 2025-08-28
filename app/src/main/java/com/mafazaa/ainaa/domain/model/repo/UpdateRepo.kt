@@ -1,6 +1,6 @@
-package com.mafazaa.ainaa.model.repo
+package com.mafazaa.ainaa.domain.model.repo
 
-import com.mafazaa.ainaa.model.UpdateState
+import com.mafazaa.ainaa.domain.model.UpdateState
 import kotlinx.coroutines.flow.Flow
 
 interface UpdateRepo {

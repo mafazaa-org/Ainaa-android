@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.services
+package com.mafazaa.ainaa.service
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -23,7 +23,7 @@ class MyVpnService: VpnService() {
 
     override fun onCreate() {
         super.onCreate()
-        MyNotificationManager.createNotificationChannel(this)
+        MyNotificationManager.createNotificationChannels(this)
         MyNotificationManager.startForegroundService(this)
     }
 
@@ -55,7 +55,7 @@ class MyVpnService: VpnService() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
         val builder = Builder().apply {
-            addAddress(Constants.Address, 32)
+            addAddress(Constants.vpnAddress, 32)
             addDnsServer(protectionLevel.primaryDns)
             addDnsServer(protectionLevel.secondaryDns)
             setSession("SafeDNS")

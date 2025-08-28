@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.model
+package com.mafazaa.ainaa.domain.model
 
 sealed class UpdateState {
     object NoUpdate : UpdateState()

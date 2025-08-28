@@ -1,19 +1,33 @@
-package com.mafazaa.ainaa.data
+package com.mafazaa.ainaa.data.repository_impl
 
 import android.util.Log
-import com.mafazaa.ainaa.*
-import com.mafazaa.ainaa.model.*
-import com.mafazaa.ainaa.model.repo.*
-import io.ktor.client.*
-import io.ktor.client.engine.android.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.coroutines.flow.*
-import kotlinx.serialization.json.*
+import com.mafazaa.ainaa.core.Constants
+import com.mafazaa.ainaa.data.NetworkResult
+import com.mafazaa.ainaa.domain.model.Report
+import com.mafazaa.ainaa.domain.model.Version
+import com.mafazaa.ainaa.domain.model.repo.RemoteRepo
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.readBytes
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json.Default.parseToJsonElement
-import java.io.*
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
+import java.io.File
 
 class KtorRepo: RemoteRepo {
 
@@ -49,7 +63,7 @@ class KtorRepo: RemoteRepo {
                 downloadAsset?.get("browser_download_url")?.jsonPrimitive?.content.orEmpty()
             val size = downloadAsset?.get("size")?.jsonPrimitive?.longOrNull ?: 0L
             val version = tagName.removePrefix("v").toInt()
-            return Version(version, name, downloadUrl, body,size)
+            return Version(version, name, downloadUrl, body, size)
         } catch (e: Exception) {
             e.printStackTrace()
             null

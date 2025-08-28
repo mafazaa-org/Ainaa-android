@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.services
+package com.mafazaa.ainaa.service
 
 import android.app.*
 import android.app.usage.*
@@ -8,20 +8,14 @@ import android.os.*
 import android.util.*
 import android.view.*
 import androidx.compose.ui.platform.*
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.ViewModelStore
-import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.setViewTreeLifecycleOwner
-import androidx.lifecycle.setViewTreeViewModelStoreOwner
-import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.mafazaa.ainaa.*
-import com.mafazaa.ainaa.MyApp.Companion.stopMonitoring
+import com.mafazaa.ainaa.core.Constants
 import com.mafazaa.ainaa.data.*
+import com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source.LocalData
 import com.mafazaa.ainaa.databinding.LockScreenLayoutBinding
 import com.mafazaa.ainaa.ui.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.java.KoinJavaComponent.inject
 
 class MonitorService: Service() {
@@ -34,7 +28,7 @@ class MonitorService: Service() {
 
     override fun onCreate() {
         super.onCreate()
-        MyNotificationManager.createNotificationChannel(this)
+        MyNotificationManager.createNotificationChannels(this)
         MyNotificationManager.startForegroundService(this)
         usageStatsManager = getSystemService(USAGE_STATS_SERVICE) as UsageStatsManager
         startListeningToConfig()

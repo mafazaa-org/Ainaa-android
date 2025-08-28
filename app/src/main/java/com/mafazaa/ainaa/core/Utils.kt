@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa
+package com.mafazaa.ainaa.core
 
 import android.content.*
 import android.content.pm.*
@@ -8,7 +8,8 @@ import android.provider.*
 import androidx.activity.*
 import androidx.core.content.*
 import androidx.core.net.*
-import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.Lg
+import com.mafazaa.ainaa.domain.model.AppInfo
 import java.io.*
 
 fun Context.installApk(apkFile: File) {

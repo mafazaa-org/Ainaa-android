@@ -1,9 +1,11 @@
 package com.mafazaa.ainaa.data
 
-import android.util.*
 import com.mafazaa.ainaa.*
-import com.mafazaa.ainaa.model.*
-import com.mafazaa.ainaa.model.repo.*
+import com.mafazaa.ainaa.data.repository_impl.data_source.local_data_source.LocalData
+import com.mafazaa.ainaa.domain.model.UpdateState
+import com.mafazaa.ainaa.domain.model.repo.FileRepo
+import com.mafazaa.ainaa.domain.model.repo.RemoteRepo
+import com.mafazaa.ainaa.domain.model.repo.UpdateRepo
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -20,7 +22,8 @@ class UpdateManager(
 
         val version = try {
             repo.getLatestVersion()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Lg.e(TAG, "Failed to fetch latest version", e)
             emit(UpdateState.NoUpdate)
             return@flow
         }
@@ -59,5 +62,4 @@ class UpdateManager(
     companion object {
         const val TAG = "UpdateManager"
     }
-
 }

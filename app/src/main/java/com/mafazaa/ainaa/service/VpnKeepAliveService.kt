@@ -1,7 +1,9 @@
-package com.mafazaa.ainaa.services
+package com.mafazaa.ainaa.service
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -13,7 +15,8 @@ import android.os.IBinder
 import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import com.mafazaa.ainaa.R
-
+import com.mafazaa.ainaa.core.Constants
+import com.mafazaa.ainaa.domain.model.ProtectionLevel
 
 
 class VpnKeepAliveService : Service() {
@@ -26,14 +29,15 @@ class VpnKeepAliveService : Service() {
             }
         }
     }
+    @SuppressLint("ObsoleteSdkInt")
     private fun createNotificationChannel() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = android.app.NotificationChannel(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
                 "vpn_channel",
                 "VPN Service",
-                android.app.NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_LOW
             )
-            val manager = getSystemService(android.app.NotificationManager::class.java)
+            val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }
     }
@@ -82,7 +86,7 @@ class VpnKeepAliveService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
 
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
         alarmManager.set(
             AlarmManager.ELAPSED_REALTIME,
             SystemClock.elapsedRealtime() + 1000,
@@ -95,15 +99,20 @@ class VpnKeepAliveService : Service() {
 
 
     private fun checkVpnAndReconnect() {
-        if (!MyVpnService.isRunning) {
+        if (!MyVpnService.Companion.isRunning) {
             restartVpn()
         }
     }
 
     private fun restartVpn() {
+        val prefs = getSharedPreferences(Constants.VPN_SH_PREF_NAME, Context.MODE_PRIVATE)
+        val savedLevelOrdinal = prefs.getInt(Constants.VPN_SH_PREF_KEY, ProtectionLevel.LOW.ordinal)
+
         val vpnIntent = Intent(this, MyVpnService::class.java).apply {
             action = MyVpnService.ACTION_START
+            putExtra(MyVpnService.EXTRA_LEVEL, savedLevelOrdinal)
         }
         startService(vpnIntent)
     }
+
 }
