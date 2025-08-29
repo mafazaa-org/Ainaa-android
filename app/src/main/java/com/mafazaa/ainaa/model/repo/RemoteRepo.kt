@@ -9,11 +9,11 @@ import java.io.File
 interface RemoteRepo {
     fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<NetworkResult>
     fun submitReportToGoogleForm(report: Report): Flow<NetworkResult>
-    suspend fun getLatestVersion(): Version?
-    suspend fun downloadFile(
-        url: String,
-        file: File,
-    ): Boolean
+    // suspend fun getLatestVersion(): Version?
+    // suspend fun downloadFile(
+    //     url: String,
+    //     file: File,
+    // ): Boolean
 
 
 }

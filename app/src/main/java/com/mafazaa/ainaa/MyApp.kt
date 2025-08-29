@@ -48,17 +48,17 @@ class MyApp: Application() {
             .setRequiresCharging(false)
             .build()
 
-        val dailyWorkRequest =
-            PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS) // minimum interval for testing
-                .setConstraints(constraints)
-                .build()
+        // val dailyWorkRequest =
+        //     PeriodicWorkRequestBuilder<DailyNotificationWorker>(1, TimeUnit.DAYS) // minimum interval for testing
+        //         .setConstraints(constraints)
+        //         .build()
 
-        WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork(
-                "DailyNotificationWork",
-                ExistingPeriodicWorkPolicy.KEEP,
-                dailyWorkRequest
-            )
+        // WorkManager.getInstance(this)
+        //     .enqueueUniquePeriodicWork(
+        //         "DailyNotificationWork",
+        //         ExistingPeriodicWorkPolicy.KEEP,
+        //         dailyWorkRequest
+        //     )
     }
 
     companion object {

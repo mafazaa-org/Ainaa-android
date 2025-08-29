@@ -50,18 +50,18 @@ object MyNotificationManager {
         service.startForeground(SERVICE_ID, notification)
     }
 
-    fun showUpdateNotification(context: Context) {
-        if (!notificationChannelCreated) {
-            createNotificationChannels(context)
-        }
-        val notification = NotificationCompat.Builder(context, UPDATE_CHANNEL_ID)
-            .setContentTitle("إصدار جديد متوفر")
-            .setContentText("هناك إصدار جديد من تطبيق عيناً متوفر، يرجى التحديث إلى آخر إصدار لتحسين تجربتك.")
-            .setSmallIcon(R.drawable.ic_red)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(false)
-            .build()
-        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.notify(UPDATE_ID, notification)
-    }
+    // fun showUpdateNotification(context: Context) {
+    //     if (!notificationChannelCreated) {
+    //         createNotificationChannels(context)
+    //     }
+    //     val notification = NotificationCompat.Builder(context, UPDATE_CHANNEL_ID)
+    //         .setContentTitle("إصدار جديد متوفر")
+    //         .setContentText("هناك إصدار جديد من تطبيق عيناً متوفر، يرجى التحديث إلى آخر إصدار لتحسين تجربتك.")
+    //         .setSmallIcon(R.drawable.ic_red)
+    //         .setPriority(NotificationCompat.PRIORITY_HIGH)
+    //         .setAutoCancel(false)
+    //         .build()
+    //     val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    //     manager.notify(UPDATE_ID, notification)
+    // }
 }

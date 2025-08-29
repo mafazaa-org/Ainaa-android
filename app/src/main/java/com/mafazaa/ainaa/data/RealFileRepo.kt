@@ -6,10 +6,10 @@ import java.io.*
 
 class RealFileRepo(val context: Context): FileRepo {
 
-    override fun getUpdateFile(): File = File(
-        context.filesDir,
-        "update.apk"
-    )
+    // override fun getUpdateFile(): File = File(
+    //     context.filesDir,
+    //     "update.apk"
+    // )
 
     override fun getLogFile(): File = File(context.cacheDir, "log.txt")
     override fun getLogSize(): Long {

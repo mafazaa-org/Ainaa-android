@@ -14,13 +14,13 @@ class MainViewModel(
     private val remoteRepo: RemoteRepo,
     private val localData: LocalData,
     private val fileRepo: FileRepo ,
-    private val updateRepo: UpdateRepo
+    // private val updateRepo: UpdateRepo
 ): ViewModel() {
 
     private val TAG = "MainViewModel"
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps.asStateFlow()
-    var updateState = mutableStateOf<UpdateState>(UpdateState.NoUpdate)
+    // var updateState = mutableStateOf<UpdateState>(UpdateState.NoUpdate)
     fun loadInstalledApps(appList: List<AppInfo>) {
         val appList = appList.toMutableList()
         val selectedApps = localData.apps
@@ -63,14 +63,14 @@ class MainViewModel(
         }
     }
 
-    fun handleUpdateStatus(){
-        viewModelScope.launch {
-            updateRepo.checkAndDownloadIfNeeded(BuildConfig.VERSION_CODE).collect {
-                updateState.value = it
-                Log.d(TAG, "Update state: $it")
-            }
-        }
-    }
+    // fun handleUpdateStatus(){
+    //     viewModelScope.launch {
+    //         updateRepo.checkAndDownloadIfNeeded(BuildConfig.VERSION_CODE).collect {
+    //             updateState.value = it
+    //             Log.d(TAG, "Update state: $it")
+    //         }
+    //     }
+    // }
     fun getLogFile(): File {
         return fileRepo.getLogFile()
     }
@@ -83,8 +83,8 @@ class MainViewModel(
         localData.phoneNum = phoneNumber
     }
 
-    fun updateFile(): File {
-        return fileRepo.getUpdateFile()
-    }
+    // fun updateFile(): File {
+    //     return fileRepo.getUpdateFile()
+    // }
 
 }

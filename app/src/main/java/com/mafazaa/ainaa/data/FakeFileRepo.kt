@@ -4,7 +4,7 @@ import com.mafazaa.ainaa.model.FileRepo
 import java.io.File
 
 object FakeFileRepo: FileRepo {
-    override fun getUpdateFile(): File =File("fake")
+    // override fun getUpdateFile(): File =File("fake")
 
     override fun getLogFile(): File = File("fake")
 

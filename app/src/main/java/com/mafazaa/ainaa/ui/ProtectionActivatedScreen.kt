@@ -20,8 +20,8 @@ fun ProtectionActivatedScreen(
     onBlockAppClick: () -> Unit,
     onReportClick: () -> Unit,
     onConfirmProtectionClick: () -> Unit,
-    onUpdateClick: (updateState: UpdateState) -> Unit = { /* Default no-op */ },
-    updateState: UpdateState = UpdateState.NoUpdate,
+    // onUpdateClick: (updateState: UpdateState) -> Unit = { /* Default no-op */ },
+    // updateState: UpdateState = UpdateState.NoUpdate,
 
     ) {
     Column(
@@ -86,6 +86,7 @@ fun ProtectionActivatedScreen(
         }
         ReportLink(onReportClick = onReportClick)
         Spacer(modifier = Modifier.height(16.dp))
+        /* Temporarily commented out update-related code
         val (black, red) = when (updateState) {
             UpdateState.NoUpdate -> Pair("لا يوجد تحديث متاح", "اضغط للتحقق")
             UpdateState.Checking -> Pair("جاري التحقق من وجود تحديثات", "")
@@ -95,6 +96,7 @@ fun ProtectionActivatedScreen(
         }
 
         TowColorText(black = black, red = red, onClick = { onUpdateClick(updateState) })
+        */
 
     }
 }

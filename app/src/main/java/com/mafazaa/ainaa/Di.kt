@@ -13,7 +13,7 @@ val appModule = module {
     single<RemoteRepo> { if (BuildConfig.DEBUG) FakeRemoteRepo else KtorRepo() }
     single<LocalData> { LocalData(androidContext().getSharedPreferences("App", MODE_PRIVATE)) }
     single<FileRepo> { RealFileRepo(androidContext()) }
-    single<UpdateRepo> { UpdateManager(get(), get(), get()) }
+    // single<UpdateRepo> { UpdateManager(get(), get(), get()) }
 
-    viewModel { MainViewModel(get(), get(), get(), get()) }
+    viewModel { MainViewModel(get(), get(), get() /* , get() */) }
 }

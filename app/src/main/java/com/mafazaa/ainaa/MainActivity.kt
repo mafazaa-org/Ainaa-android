@@ -217,24 +217,24 @@ class MainActivity: ComponentActivity() {
                                             }
                                         },
                                         onReportClick = { showReportDialog = true },
-                                        onUpdateClick = { updateStatus ->
-                                            when (updateStatus) {
-                                                UpdateState.Downloaded -> {
-                                                    context.installApk(viewModel.updateFile())
-                                                }
+                                        // onUpdateClick = { updateStatus ->
+                                        //     when (updateStatus) {
+                                        //         UpdateState.Downloaded -> {
+                                        //             context.installApk(viewModel.updateFile())
+                                        //         }
 
-                                                is UpdateState.Failed,
-                                                UpdateState.NoUpdate,
-                                                    -> {
-                                                    viewModel.handleUpdateStatus()
-                                                }
+                                        //         is UpdateState.Failed,
+                                        //         UpdateState.NoUpdate,
+                                        //             -> {
+                                        //             viewModel.handleUpdateStatus()
+                                        //         }
 
-                                                else -> {
-                                                }
-                                            }
+                                        //         else -> {
+                                        //         }
+                                        //     }
 
-                                        },
-                                        updateState = viewModel.updateState.value,
+                                        // },
+                                        // updateState = viewModel.updateState.value,
                                         onConfirmProtectionClick = {
                                             showHowItWorks = true
                                         },
