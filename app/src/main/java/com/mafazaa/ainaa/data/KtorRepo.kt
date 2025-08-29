@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.*
 
 class KtorRepo: RemoteRepo {
 
-    val phoneNumberFormUrl = "https://docs.google.com/forms/d/1SisfmhFyuSPjafRb3UKf66QBgjO83Bcxc7DfIkddRiM/ ";
+    val phoneNumberFormUrl = "https://docs.google.com/forms/d/1SisfmhFyuSPjafRb3UKf66QBgjO83Bcxc7DfIkddRiM/formResponse ";
     val phoneNumberEntryId = "entry.1388739102" // Your Entry ID
 
     val reportProblemFormUrl =
@@ -106,12 +106,12 @@ class KtorRepo: RemoteRepo {
         try {
             val response: HttpResponse = client.post(reportProblemFormUrl) {
                 contentType(ContentType.Application.FormUrlEncoded)
-                setBody(
-                    "${reportNameEntryId}=${report.name}&" + // name
-                            "${reportPhoneNumberEntryId}=${report.phone}&" + // phoneNumber
-                            "${reportEmailEntryId}=${report.email}&" + // mail
-                            "${reportProblemEntryId}=${report.problem}" // problem
-                )
+                setBody(Parameters.build {
+                    append(reportNameEntryId, report.name)
+                    append(reportPhoneNumberEntryId, report.phone)
+                    append(reportEmailEntryId, report.email)
+                    append(reportProblemEntryId, report.problem)
+                }.formUrlEncode())
             }
 
             if (!response.status.isSuccess()) {
