@@ -24,15 +24,15 @@ fun BottomBar(
     Box(
         modifier.fillMaxWidth(),
     ) {
-        Text(
-            text = "Android:$androidVersion",
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(end = 8.dp),
-            color = red.copy(alpha = .7f),
-            style = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold),
-            fontSize = 10.sp
-        )
+        // Text(
+        //     text = "Android:$androidVersion",
+        //     modifier = Modifier
+        //         .align(Alignment.CenterEnd)
+        //         .padding(end = 8.dp),
+        //     color = red.copy(alpha = .7f),
+        //     style = LocalTextStyle.current.copy(fontWeight = FontWeight.Bold),
+        //     fontSize = 10.sp
+        // )
         Image(
             painter = painterResource(id = R.drawable.logo_red),
             contentDescription = "logo",
