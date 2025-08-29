@@ -17,10 +17,17 @@ import java.io.*
 
 class KtorRepo: RemoteRepo {
 
-    val googleFormUrl =
-        "https://docs.google.com/forms/d/e/1FAIpQLSfnspR0eAjWtYKbweOQSAOrq2OWR8dkvyEy_uj0XokrNiHnPw/formResponse"
+    val phoneNumberFormUrl = "https://docs.google.com/forms/d/1SisfmhFyuSPjafRb3UKf66QBgjO83Bcxc7DfIkddRiM/ ";
     val phoneNumberEntryId = "entry.1388739102" // Your Entry ID
-    // Initialize Ktor client
+
+    val reportProblemFormUrl =
+        "https://docs.google.com/forms/d/e/1FAIpQLSfnspR0eAjWtYKbweOQSAOrq2OWR8dkvyEy_uj0XokrNiHnPw/formResponse"
+    val reportNameEntryId = "entry.654511892";
+    val reportPhoneNumberEntryId = "entry.1692603949";
+    val reportEmailEntryId = "entry.742958279";
+    val reportProblemEntryId = "entry.1462277143";
+    
+        // Initialize Ktor client
     val client = HttpClient(Android) {
         install(Logging) {
             level = LogLevel.BODY
@@ -79,7 +86,7 @@ class KtorRepo: RemoteRepo {
     override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<NetworkResult> = flow {
         emit(NetworkResult.Loading)
         try {
-            val response: HttpResponse = client.post(googleFormUrl) {
+            val response: HttpResponse = client.post(phoneNumberFormUrl) {
                 contentType(ContentType.Application.FormUrlEncoded)
                 setBody("$phoneNumberEntryId=$phoneNumber")
             }
@@ -97,13 +104,13 @@ class KtorRepo: RemoteRepo {
     override fun submitReportToGoogleForm(report: Report): Flow<NetworkResult> = flow {
         emit(NetworkResult.Loading)
         try {
-            val response: HttpResponse = client.post(googleFormUrl) {
+            val response: HttpResponse = client.post(reportProblemFormUrl) {
                 contentType(ContentType.Application.FormUrlEncoded)
                 setBody(
-                    "entry.654511892=${report.name}&" + // name
-                            "entry.1692603949=${report.phone}&" + // phoneNumber
-                            "entry.742958279=${report.email}&" + // mail
-                            "entry.1462277143=${report.problem}" // problem
+                    "${reportNameEntryId}=${report.name}&" + // name
+                            "${reportPhoneNumberEntryId}=${report.phone}&" + // phoneNumber
+                            "${reportEmailEntryId}=${report.email}&" + // mail
+                            "${reportProblemEntryId}=${report.problem}" // problem
                 )
             }
 
