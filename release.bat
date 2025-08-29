@@ -87,7 +87,7 @@ set /p NEW_VERSION_CODE=<versionCode
 set /a NEW_VERSION_CODE=%NEW_VERSION_CODE%+1
 
 :: Update version in build.gradle.kts
-powershell -Command "(Get-Content app\build.gradle.kts) -replace 'versionCode = \d+', 'versionCode = 1' | Set-Content app\build.gradle.kts"
+powershell -Command "(Get-Content app\build.gradle.kts) -replace 'versionCode = \d+', 'versionCode = %NEW_VERSION_CODE%' | Set-Content app\build.gradle.kts"
 powershell -Command "(Get-Content app\build.gradle.kts) -replace 'versionName = \".*\"', 'versionName = \"%NEW_VERSION_V%\"' | Set-Content app\build.gradle.kts"
 
 echo Building release APK and Bundle...
