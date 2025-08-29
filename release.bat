@@ -92,11 +92,29 @@ powershell -Command "(Get-Content app\build.gradle.kts) -replace 'versionName = 
 
 echo Building release APK and Bundle...
 
+:: renaming old app to keep it
+del _ainaa.apk
+del _ainaa.apk.idsig
+del _ainaa.aab
+ren ainaa.apk _ainaa.apk
+ren ainaa.apk.idsig _ainaa.apk.idsig
+ren ainaa.aab _ainaa.aab
+
 :: Clean the project
 call gradlew clean
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 call build_release.bat
+
+:: Build AAB
+call gradlew bundleRelease
+if %errorlevel% neq 0 exit /b %errorlevel%
+
+
+:: Signing the aab
+call jarsigner -keystore ainaa.jks -signedjar ainaa.aab app\build\outputs\bundle\release\app-release.aab ainaa
+
+call apksigner verify --print-certs ainaa.aab
 
 echo %NEW_VERSION_CODE% > versionCode
 
@@ -111,14 +129,10 @@ git push --tags upstream -f
 gh release create %NEW_VERSION_V% --generate-notes ^
     "ainaa.apk#ainaa.apk"
 
-del _ainaa.apk
-del _ainaa.apk.idsig
-ren ainaa.apk _ainaa.apk
-ren ainaa.apk.idsig _ainaa.apk.idsig
-
 echo.
 echo Release %NEW_VERSION_V% completed successfully!
-echo APK location: _ainaa.apk
+echo APK location: ainaa.apk
+echo Bundle location: ainaa.aab
 echo.
 
 
