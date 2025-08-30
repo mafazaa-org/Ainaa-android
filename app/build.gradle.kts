@@ -13,8 +13,8 @@ android {
         applicationId = "com.mafazaa.ainaa"
         minSdk = 26
         targetSdk = 36
-        versionCode = 9
-        versionName = "v0.0.3"
+        versionCode = 10
+        versionName = "v0.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
