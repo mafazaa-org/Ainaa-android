@@ -6,6 +6,6 @@ object Constants {
     const val supportUrl = "https://ainaa.mafazaa.com/support_us"
     const val joinUrl = "https://www.mafazaa.com/join"
     const val releaseApkName = "ainaa"
-    const val contactSupportUrl="https://dev.ainaa.mafazaa.com/support"
+    const val contactSupportUrl="https://ainaa.mafazaa.com/support"
     const val safeSearchUrl ="https://google.com/safesearch"
 }

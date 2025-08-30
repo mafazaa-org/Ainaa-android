@@ -46,7 +46,7 @@ fun ConfirmDeleteDialog(
 
                 // Title
                 Text(
-                    text = "هل انت متأكد من انك تريد مسح ${app.name}",
+                    text = "هل انت متأكد من انك تريد حجب ${app.name}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
