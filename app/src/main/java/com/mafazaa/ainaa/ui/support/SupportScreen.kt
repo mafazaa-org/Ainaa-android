@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.ui
+package com.mafazaa.ainaa.ui.support
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mafazaa.ainaa.BuildConfig
+import com.mafazaa.ainaa.ui.comp.TowColorText
 import com.mafazaa.ainaa.ui.theme.red
 
 @Composable
@@ -53,7 +54,6 @@ fun SupportScreen(
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        // Box 1: الدعم المادي
         Card(
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             modifier = Modifier

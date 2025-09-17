@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.ui
+package com.mafazaa.ainaa.ui.enable_pro
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.*

@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.ui
+package com.mafazaa.ainaa.ui.pro_activated
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -10,8 +10,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.style.*
 import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.*
-import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.ui.comp.ReportLink
 import com.mafazaa.ainaa.ui.theme.*
 
 @Composable

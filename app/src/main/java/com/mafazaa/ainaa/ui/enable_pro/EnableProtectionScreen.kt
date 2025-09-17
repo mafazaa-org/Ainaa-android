@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.ui
+package com.mafazaa.ainaa.ui.enable_pro
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,12 +11,11 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import com.mafazaa.ainaa.R
 import com.mafazaa.ainaa.model.*
+import com.mafazaa.ainaa.ui.comp.ReportLink
 import com.mafazaa.ainaa.ui.theme.*
 
 @Composable

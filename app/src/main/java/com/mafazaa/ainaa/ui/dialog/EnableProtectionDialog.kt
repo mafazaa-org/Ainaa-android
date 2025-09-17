@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.ui
+package com.mafazaa.ainaa.ui.dialog
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*

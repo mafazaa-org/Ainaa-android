@@ -1,18 +1,16 @@
-package com.mafazaa.ainaa.ui
+package com.mafazaa.ainaa.ui.comp
 
-import androidx.compose.foundation.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.text.*
-import androidx.compose.ui.text.font.*
-import androidx.compose.ui.text.style.*
-import androidx.compose.ui.unit.*
-
-@Composable
-fun ReportLink(modifier: Modifier = Modifier, onReportClick: () -> Unit) {
-    TowColorText(modifier, "اكتشفت ثغرة او موقع غير محجوب؟ ", "أخبرنا بها", onReportClick)
-}
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun TowColorText(modifier: Modifier= Modifier, black: String, red: String, onClick: () -> Unit) {
