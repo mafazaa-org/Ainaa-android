@@ -1,9 +1,9 @@
-package com.mafazaa.ainaa.data
+package com.mafazaa.ainaa.data.local
 
-import android.content.*
+import android.content.SharedPreferences
 import com.mafazaa.ainaa.model.ProtectionLevel
-import kotlin.properties.*
-import kotlin.reflect.*
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 /**
  * Advanced delegation, allowing for custom keys and defaults, and type safety. A little more verbose at the usage site.

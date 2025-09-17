@@ -1,16 +1,18 @@
 package com.mafazaa.ainaa.service
 
-import android.app.*
-import android.content.*
-import android.os.*
-import androidx.core.app.*
-import com.mafazaa.ainaa.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.Service
+import android.content.Context
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import com.mafazaa.ainaa.R
 
 object MyNotificationManager {
     const val SERVICE_CHANNEL_ID = "ainaa"
     const val UPDATE_CHANNEL_ID = "ainaa_update"
     const val SERVICE_ID = 1
-    const val UPDATE_ID = 2
     var notificationChannelCreated = false
     fun createNotificationChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -50,18 +52,4 @@ object MyNotificationManager {
         service.startForeground(SERVICE_ID, notification)
     }
 
-    // fun showUpdateNotification(context: Context) {
-    //     if (!notificationChannelCreated) {
-    //         createNotificationChannels(context)
-    //     }
-    //     val notification = NotificationCompat.Builder(context, UPDATE_CHANNEL_ID)
-    //         .setContentTitle("إصدار جديد متوفر")
-    //         .setContentText("هناك إصدار جديد من تطبيق عيناً متوفر، يرجى التحديث إلى آخر إصدار لتحسين تجربتك.")
-    //         .setSmallIcon(R.drawable.ic_red)
-    //         .setPriority(NotificationCompat.PRIORITY_HIGH)
-    //         .setAutoCancel(false)
-    //         .build()
-    //     val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    //     manager.notify(UPDATE_ID, notification)
-    // }
 }

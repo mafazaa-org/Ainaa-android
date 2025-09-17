@@ -1,23 +1,18 @@
 package com.mafazaa.ainaa.data
 
-import android.content.*
-import com.mafazaa.ainaa.model.*
-import java.io.*
+import android.content.Context
+import com.mafazaa.ainaa.model.FileRepo
+import java.io.File
 
 class RealFileRepo(val context: Context): FileRepo {
 
-    // override fun getUpdateFile(): File = File(
-    //     context.filesDir,
-    //     "update.apk"
-    // )
-
-    override fun getLogFile(): File = File(context.cacheDir, "log.txt")
-    override fun getLogSize(): Long {
-        return getLogFile().length()
+    override fun getLogFile(fileName: String): File = File(context.cacheDir, fileName)
+    override fun getLogSize(fileName: String): Long {
+        return getLogFile(fileName).length()
     }
 
-    override fun wipeLog() {
-        val logFile = getLogFile()
+    override fun wipeLog(fileName: String) {
+        val logFile = getLogFile(fileName)
         if (logFile.exists()) {
             logFile.writeText("") // Clear the log file
         } else {
@@ -25,8 +20,8 @@ class RealFileRepo(val context: Context): FileRepo {
         }
     }
 
-    override fun saveToLog(content: String) {
-        val logFile = getLogFile()
+    override fun saveToLog(content: String, fileName: String) {
+        val logFile = getLogFile(fileName)
         logFile.appendText(content)
     }
 }

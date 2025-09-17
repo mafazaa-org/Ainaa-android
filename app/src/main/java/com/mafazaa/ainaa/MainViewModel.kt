@@ -1,25 +1,33 @@
 package com.mafazaa.ainaa
 
-import android.util.*
-import androidx.compose.runtime.*
-import androidx.lifecycle.*
-import com.mafazaa.ainaa.data.*
-import com.mafazaa.ainaa.model.*
-import com.mafazaa.ainaa.model.repo.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.mafazaa.ainaa.data.local.LocalData
+import com.mafazaa.ainaa.data.local.add
+import com.mafazaa.ainaa.data.local.remove
+import com.mafazaa.ainaa.data.remote.NetworkResult
+import com.mafazaa.ainaa.model.AppInfo
+import com.mafazaa.ainaa.model.FileRepo
+import com.mafazaa.ainaa.model.ProtectionLevel
+import com.mafazaa.ainaa.model.Report
+import com.mafazaa.ainaa.model.repo.RemoteRepo
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.io.File
 
 class MainViewModel(
     private val remoteRepo: RemoteRepo,
     private val localData: LocalData,
-    private val fileRepo: FileRepo ,
+    private val fileRepo: FileRepo,
     // private val updateRepo: UpdateRepo
-): ViewModel() {
+) : ViewModel() {
 
     private val TAG = "MainViewModel"
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps.asStateFlow()
+
     // var updateState = mutableStateOf<UpdateState>(UpdateState.NoUpdate)
     fun loadInstalledApps(appList: List<AppInfo>) {
         val appList = appList.toMutableList()
@@ -63,14 +71,6 @@ class MainViewModel(
         }
     }
 
-    // fun handleUpdateStatus(){
-    //     viewModelScope.launch {
-    //         updateRepo.checkAndDownloadIfNeeded(BuildConfig.VERSION_CODE).collect {
-    //             updateState.value = it
-    //             Log.d(TAG, "Update state: $it")
-    //         }
-    //     }
-    // }
     fun getLogFile(): File {
         return fileRepo.getLogFile()
     }
@@ -83,8 +83,5 @@ class MainViewModel(
         localData.phoneNum = phoneNumber
     }
 
-    // fun updateFile(): File {
-    //     return fileRepo.getUpdateFile()
-    // }
 
 }

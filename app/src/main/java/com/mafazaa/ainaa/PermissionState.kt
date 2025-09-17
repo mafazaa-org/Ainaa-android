@@ -5,5 +5,6 @@ enum class PermissionState {
     UsageStats,
     Overlay,
     Vpn,
-    Granted
+    Accessibility,
+    Granted,
 }

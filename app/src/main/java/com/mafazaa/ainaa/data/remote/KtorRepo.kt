@@ -1,16 +1,24 @@
-package com.mafazaa.ainaa.data
+package com.mafazaa.ainaa.data.remote
 
 // import android.util.Log
 // import com.mafazaa.ainaa.*
-import com.mafazaa.ainaa.model.*
-import com.mafazaa.ainaa.model.repo.*
-import io.ktor.client.*
-import io.ktor.client.engine.android.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.coroutines.flow.*
+import com.mafazaa.ainaa.model.Report
+import com.mafazaa.ainaa.model.repo.RemoteRepo
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.Parameters
+import io.ktor.http.contentType
+import io.ktor.http.formUrlEncode
+import io.ktor.http.isSuccess
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+
 // import kotlinx.serialization.json.*
 // import kotlinx.serialization.json.Json.Default.parseToJsonElement
 // import java.io.*
@@ -33,55 +41,7 @@ class KtorRepo: RemoteRepo {
             level = LogLevel.BODY
         }
     }
-    // val latestVersionUrl =
-    //     "https://api.github.com/repos/mafazaa-org/Ainaa-android/releases/latest"
 
-    // override suspend fun getLatestVersion(): Version? {
-    //     return try {
-    //         val client = HttpClient(Android)
-    //         val response: HttpResponse =
-    //             client.get(latestVersionUrl) {
-    //                 header("Accept", "application/vnd.github+json")
-    //                 header("X-GitHub-Api-Version", "2022-11-28")
-    //             }
-    //         val json = parseToJsonElement(response.bodyAsText()).jsonObject
-    //         val tagName = json["tag_name"]?.jsonPrimitive?.content.orEmpty()
-    //         val name = json["name"]?.jsonPrimitive?.content.orEmpty()
-    //         val body = json["body"]?.jsonPrimitive?.content.orEmpty()
-    //         val assets = json["assets"]?.jsonArray.orEmpty()
-    //         val downloadAsset = assets
-    //             .map { it.jsonObject }
-    //             .firstOrNull { it["name"]?.jsonPrimitive?.content?.contains(Constants.releaseApkName) == true }
-    //         val downloadUrl =
-    //             downloadAsset?.get("browser_download_url")?.jsonPrimitive?.content.orEmpty()
-    //         val size = downloadAsset?.get("size")?.jsonPrimitive?.longOrNull ?: 0L
-    //         val version = tagName.removePrefix("v").toInt()
-    //         return Version(version, name, downloadUrl, body,size)
-    //     } catch (e: Exception) {
-    //         e.printStackTrace()
-    //         null
-    //     }
-    // }
-
-    // override suspend fun downloadFile(url: String, file: File): Boolean {
-    //     return try {
-    //         Log.d("KtorRepo", "Downloading file from $url to ${file.absolutePath}")
-    //         val response: HttpResponse = client.get(url)
-    //         if (response.status.isSuccess()) {
-    //             val bytes = response.readBytes()
-    //             file.apply {
-    //                 parentFile?.mkdirs() // Ensure parent directories exist
-    //                 writeBytes(bytes) // Write the downloaded bytes to the file
-    //             }
-    //             true
-    //         } else {
-    //             false
-    //         }
-    //     } catch (e: Exception) {
-    //         e.printStackTrace()
-    //         false
-    //     }
-    // }
 
     override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<NetworkResult> = flow {
         emit(NetworkResult.Loading)
@@ -132,4 +92,3 @@ suspend fun main() {
         println(it)
     }
 }
-

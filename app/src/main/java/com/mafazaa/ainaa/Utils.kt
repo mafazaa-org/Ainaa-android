@@ -1,15 +1,25 @@
 package com.mafazaa.ainaa
 
-import android.content.*
-import android.content.pm.*
-import android.net.*
-import android.os.*
-import android.provider.*
-import androidx.activity.*
-import androidx.core.content.*
-import androidx.core.net.*
-import com.mafazaa.ainaa.model.*
-import java.io.*
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.app.AppOpsManager
+import android.app.KeyguardManager
+import android.content.Context
+import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
+import android.net.VpnService.prepare
+import android.os.Build
+import android.provider.Settings
+import android.provider.Settings.canDrawOverlays
+import android.view.accessibility.AccessibilityNodeInfo
+import androidx.activity.ComponentActivity
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.core.net.toUri
+import com.mafazaa.ainaa.model.AppInfo
+import com.mafazaa.ainaa.service.MyAccessibilityService
+import com.mafazaa.ainaa.service.MyVpnService
+import java.io.File
 
 fun Context.installApk(apkFile: File) {
     val intent = Intent(Intent.ACTION_VIEW)
@@ -28,11 +38,50 @@ fun Context.installApk(apkFile: File) {
         Lg.e("InstallApk", "Error starting install", e)
     }
 }
+fun Context.startVpnService() {
 
+    val intent = Intent(this, MyVpnService::class.java).apply {
+        action = MyVpnService.ACTION_START
+    }
+    prepare(this)
+    ContextCompat.startForegroundService(this, intent)
+    MyVpnService.isRunning = true
+}
 fun Context.openUrl(url: String) {
     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
     intent.addCategory(Intent.CATEGORY_BROWSABLE)
     startActivity(intent)
+}
+fun Context.hasOverlayPermission(): Boolean = canDrawOverlays(this)
+fun Context.hasUsageStatsPermission(): Boolean {
+    val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+    val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        appOps.unsafeCheckOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            android.os.Process.myUid(), packageName
+        )
+    } else {
+        appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            android.os.Process.myUid(), packageName
+        )
+    }
+    return mode == AppOpsManager.MODE_ALLOWED
+}
+
+fun Context.hasNotificationPermission(): Boolean {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
+                this,
+                POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+}
+
+fun Context.hasVpnPermission(): Boolean = prepare(this) == null
+
+fun Context.isKeyguardSecure(): Boolean {
+    val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+    return keyguardManager.isKeyguardSecure
 }
 
 fun ComponentActivity.requestDrawOverlaysPermission() {
@@ -41,7 +90,7 @@ fun ComponentActivity.requestDrawOverlaysPermission() {
 }
 
 fun ComponentActivity.requestVpnPermission() {
-    val intent = VpnService.prepare(this)
+    val intent = prepare(this)
     if (intent != null) {
         startActivityForResult(intent, 0)
     }
@@ -51,8 +100,28 @@ fun ComponentActivity.requestUsageStatsPermission() {
     val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
     startActivity(intent)
 }
+fun Context.hasAccessibilityPermission(): Boolean {
+    val am =
+        getSystemService(Context.ACCESSIBILITY_SERVICE) as android.view.accessibility.AccessibilityManager
+    val enabledServices =
+        am.getEnabledAccessibilityServiceList(android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+    for (service in enabledServices) {
+        if (service.resolveInfo.serviceInfo.packageName == packageName &&
+            service.resolveInfo.serviceInfo.name == MyAccessibilityService::class.java.name
+        ) {
+            return true
+        }
+    }
+    return false
+}
 
-fun Context.shareLogFile(logFile:File) {
+fun Context.requestAccessibilityPermission() {
+    val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    startActivity(intent)
+}
+
+fun Context.shareFile(logFile: File) {
     val uri = FileProvider.getUriForFile(
         this,
         "${packageName}.provider",
@@ -63,11 +132,32 @@ fun Context.shareLogFile(logFile:File) {
         type = "text/plain"
         putExtra(Intent.EXTRA_STREAM, uri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
-    startActivity(Intent.createChooser(shareIntent, "Share log file"))
+    startActivity(Intent.createChooser(shareIntent, "Share log file").apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    })
 }
 
+fun dumpTreeToString(root: AccessibilityNodeInfo): String {
+    var nodesCount = 0
+    val sb = StringBuilder()
+    fun recurse(node: AccessibilityNodeInfo, depth: Int) {
+        val indent = "  ".repeat(depth)
+        sb.append(
+            "\n$indent- ${node.className}" +
+                    " pkg=${node.packageName} id=${node.viewIdResourceName} text=${node.text} desc=${node.contentDescription}"
+        )
+        for (i in 0 until node.childCount) {
+            node.getChild(i)?.let { recurse(it, depth + 1) }
+        }
+        nodesCount++
+    }
+    recurse(root, 0)
+    sb.insert(0, "Dumping $nodesCount nodes:")
+    return sb.toString()
+}
 fun getAllApps(context: Context): List<AppInfo> {
     val apps = mutableListOf<AppInfo>()
     val packageManager = context.packageManager

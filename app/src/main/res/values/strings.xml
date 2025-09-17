@@ -16,6 +16,8 @@
     <string name="extra_tools_for_android">Extra tools for Android</string>
     <string name="support_us">Support Us</string>
     <string name="select_a_protect_level">Select A protect Level</string>
+    <string name="accessibility_service_description">مفازا</string>
+    <string name="modifying_app_settings_or_attempting_to_disable_the_app_is_not_allowed">Modifying app settings or attempting to disable the app is not allowed.</string>
 
 
 </resources>

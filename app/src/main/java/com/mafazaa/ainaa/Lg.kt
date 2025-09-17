@@ -1,8 +1,10 @@
 package com.mafazaa.ainaa
 
-import android.util.*
-import com.mafazaa.ainaa.data.*
-import com.mafazaa.ainaa.model.*
+import android.util.Log
+import android.view.accessibility.AccessibilityNodeInfo
+import com.mafazaa.ainaa.data.FakeFileRepo
+import com.mafazaa.ainaa.model.FileRepo
+import java.io.File
 
 object Lg {
     var fileRepo: FileRepo = FakeFileRepo // inject real one later
@@ -22,6 +24,7 @@ object Lg {
                 append("-".repeat(15) + "\n")
             }
         }
+
         fileRepo.saveToLog(logLine)
     }
 
@@ -47,5 +50,14 @@ object Lg {
         val res = if (tr != null) Log.e(tag, msg, tr) else Log.e(tag, msg)
         logToFile("ERROR", tag, msg, tr)
         return res
+    }
+
+    fun logUiTree(root: AccessibilityNodeInfo): File {
+        val pkg = root.packageName ?: "unknown"
+        val fileName = "ui_tree$pkg.txt"
+        val logFile = fileRepo.getLogFile(fileName)
+        fileRepo.wipeLog(fileName)
+        fileRepo.saveToLog(dumpTreeToString(root), fileName)
+        return logFile
     }
 }

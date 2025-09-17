@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.data
+package com.mafazaa.ainaa.data.remote
 
 sealed class NetworkResult {
     object Loading: NetworkResult()

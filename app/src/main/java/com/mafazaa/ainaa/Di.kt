@@ -1,19 +1,23 @@
 package com.mafazaa.ainaa
 
-import android.content.Context.*
-import com.mafazaa.ainaa.data.*
-import com.mafazaa.ainaa.model.*
-import com.mafazaa.ainaa.model.repo.*
-import org.koin.android.ext.koin.*
-import org.koin.core.module.dsl.*
-import org.koin.dsl.*
+import android.content.Context.MODE_PRIVATE
+import com.mafazaa.ainaa.data.RealFileRepo
+import com.mafazaa.ainaa.data.local.LocalData
+import com.mafazaa.ainaa.data.remote.FakeRemoteRepo
+import com.mafazaa.ainaa.data.remote.KtorRepo
+import com.mafazaa.ainaa.model.FileRepo
+import com.mafazaa.ainaa.model.repo.RemoteRepo
+import com.mafazaa.ainaa.service.OverlayManager
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
 
 val appModule = module {
 
     single<RemoteRepo> { if (BuildConfig.DEBUG) FakeRemoteRepo else KtorRepo() }
     single<LocalData> { LocalData(androidContext().getSharedPreferences("App", MODE_PRIVATE)) }
     single<FileRepo> { RealFileRepo(androidContext()) }
-    // single<UpdateRepo> { UpdateManager(get(), get(), get()) }
+    single<OverlayManager> { OverlayManager(androidContext()) }
 
-    viewModel { MainViewModel(get(), get(), get() /* , get() */) }
+    viewModel { MainViewModel(get(), get(), get()) }
 }

@@ -1,42 +1,32 @@
 package com.mafazaa.ainaa.receiver
 
-import android.content.*
-import android.util.Log
-import androidx.core.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import com.mafazaa.ainaa.Lg
-import com.mafazaa.ainaa.data.*
-import com.mafazaa.ainaa.service.*
-import org.koin.java.KoinJavaComponent.inject
+import com.mafazaa.ainaa.data.FakeFileRepo
+import com.mafazaa.ainaa.hasAccessibilityPermission
+import com.mafazaa.ainaa.hasVpnPermission
+import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
+import com.mafazaa.ainaa.startVpnService
 
 class BootReceiver: BroadcastReceiver() {
-    val localData: LocalData by inject(LocalData::class.java)
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != Intent.ACTION_BOOT_COMPLETED) {
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
+            intent.action != Intent.ACTION_LOCKED_BOOT_COMPLETED &&
+            intent.action != Intent.ACTION_REBOOT
+        ) {
             return
         }
-        if (localData.phoneNum.isNotBlank()&& !MyVpnService.isRunning) {//has vpn permission
-            Lg.i(TAG, "Starting vpn on boot")
-            ContextCompat.startForegroundService(
-                context,
-                Intent(
-                    context,
-                    MyVpnService::class.java
-                ).apply {
-                    action = MyVpnService.ACTION_START
-                }
-            )
+        Lg.fileRepo = FakeFileRepo
+        Lg.i(TAG, "Device :${intent.action}")
+        if (context.hasAccessibilityPermission()) {
+            context.startAccessibilityService()
         }
-
-        if (localData.apps.isNotEmpty()){
-            Lg.i(TAG, "Starting daily notification worker on boot")
-            ContextCompat.startForegroundService(
-                context,
-                Intent(
-                    context,
-                    MonitorService::class.java
-                )
-            )
+        if (context.hasVpnPermission()) {
+            Lg.i(TAG, "Starting vpn on boot")
+            context.startVpnService()
         }
 
     }

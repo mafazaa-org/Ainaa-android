@@ -4,11 +4,10 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
-import android.util.Log
 import com.mafazaa.ainaa.Constants
 import com.mafazaa.ainaa.Lg
 import com.mafazaa.ainaa.MainActivity
-import com.mafazaa.ainaa.data.LocalData
+import com.mafazaa.ainaa.data.local.LocalData
 import com.mafazaa.ainaa.model.ProtectionLevel
 import org.koin.java.KoinJavaComponent.inject
 
@@ -65,6 +64,11 @@ class MyVpnService: VpnService() {
 
         vpnInterface?.close()
         vpnInterface = builder.establish()
+        if (vpnInterface == null) {
+            Lg.e(TAG, "Failed to establish VPN interface")
+            stopSelf()
+            return
+        }
         isRunning = true
     }
 
@@ -79,6 +83,7 @@ class MyVpnService: VpnService() {
 
     override fun onDestroy() {
         super.onDestroy()//todo
+        isRunning = false
         Lg.d(TAG, "VPN service destroyed")
         if (isRunning) {
             // إعادة التشغيل التلقائي
@@ -91,6 +96,7 @@ class MyVpnService: VpnService() {
 
     override fun onRevoke() {
         super.onRevoke()//todo
+        isRunning = false
         Lg.d(TAG, "VPN revoked")
         val intent = Intent(this, MyVpnService::class.java).apply {
             action = ACTION_START
