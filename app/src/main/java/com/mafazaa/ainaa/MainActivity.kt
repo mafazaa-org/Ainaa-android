@@ -245,7 +245,7 @@ class MainActivity: ComponentActivity() {
                     appVersion = BuildConfig.VERSION_NAME,
                     androidVersion = Build.VERSION.RELEASE
                 ) {
-                    if (MyVpnService.isRunning) {
+                    if (MyAccessibilityService.isRunning) {
                         backStack.add(Screen.ProtectionActivated)
                     }
                 }
