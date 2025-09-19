@@ -7,8 +7,10 @@ import android.graphics.PixelFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
+import com.mafazaa.ainaa.Lg
 import com.mafazaa.ainaa.databinding.LockScreenLayoutBinding
 import com.mafazaa.ainaa.model.BlockReason
+import com.mafazaa.ainaa.shareFile
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class OverlayManager(val context: Context) {
@@ -44,6 +46,18 @@ class OverlayManager(val context: Context) {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(intent)
             closeOverlay()
+        }
+        binding.shareLogTv.setOnClickListener {
+            closeOverlay()
+            when(reason){
+                is BlockReason.TryingToDisable -> {
+                    context.shareFile(Lg.logUiTree(reason.codeName,reason.screenAnalysis))
+                }
+                is BlockReason.UsingBlockedApp -> {
+                    context.shareFile(Lg.logWithInfo(reason.packageName))
+                }
+            }
+
         }
 
         lockOverlay = binding.root

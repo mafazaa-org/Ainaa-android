@@ -11,11 +11,12 @@ import android.net.VpnService.prepare
 import android.os.Build
 import android.provider.Settings
 import android.provider.Settings.canDrawOverlays
-import android.view.accessibility.AccessibilityNodeInfo
 import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import com.mafazaa.ainaa.model.ScreenAnalysis
+import com.mafazaa.ainaa.model.ScreenNode
 import com.mafazaa.ainaa.model.AppInfo
 import com.mafazaa.ainaa.service.MyAccessibilityService
 import com.mafazaa.ainaa.service.MyVpnService
@@ -140,23 +141,20 @@ fun Context.shareFile(logFile: File) {
     })
 }
 
-fun dumpTreeToString(root: AccessibilityNodeInfo): String {
-    var nodesCount = 0
+fun dumpTreeToString(screen: ScreenAnalysis): String {
     val sb = StringBuilder()
-    fun recurse(node: AccessibilityNodeInfo, depth: Int) {
-        val indent = "  ".repeat(depth)
-        sb.append(
-            "\n$indent- ${node.className}" +
-                    " pkg=${node.packageName} id=${node.viewIdResourceName} text=${node.text} desc=${node.contentDescription}"
-        )
-        for (i in 0 until node.childCount) {
-            node.getChild(i)?.let { recurse(it, depth + 1) }
+    sb.append("Package: ${screen.pkg}\n")
+    sb.append("Nodes count: ${screen.nodesCount}\n")
+    sb.append("Has app name: ${screen.hasAppName}\n")
+    fun dumpNode(node: ScreenNode, indent: String) {
+        sb.append("$indent Node: cls=${node.cls}, text=${node.text}, id=${node.id}, desc=${node.desc}\n")
+        for (child in node.children) {
+             dumpNode(node, "$indent  ")
         }
-        nodesCount++
     }
-    recurse(root, 0)
-    sb.insert(0, "Dumping $nodesCount nodes:")
+    dumpNode(screen.root, "")
     return sb.toString()
+
 }
 fun getAllApps(context: Context): List<AppInfo> {
     val apps = mutableListOf<AppInfo>()

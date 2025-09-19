@@ -13,8 +13,8 @@ android {
         applicationId = "com.mafazaa.ainaa"
         minSdk = 26
         targetSdk = 36
-        versionCode = 9
-        versionName = "v0.0.3"
+        versionCode = 10
+        versionName = "v0.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -87,6 +87,10 @@ dependencies {
 
 // WorkManager
     implementation("androidx.work:work-runtime-ktx:2.10.3")
+    //js engine
+    implementation("org.mozilla:rhino:1.7.14")
+    //gson
+    implementation("com.google.code.gson:gson:2.10.1")
 
 
     implementation(libs.androidx.core.ktx)

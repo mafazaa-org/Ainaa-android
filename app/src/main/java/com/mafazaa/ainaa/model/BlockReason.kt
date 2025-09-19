@@ -1,7 +1,5 @@
 package com.mafazaa.ainaa.model
 
-import android.view.accessibility.AccessibilityNodeInfo
-
 sealed class BlockReason {
     abstract fun getName(): String
     data class UsingBlockedApp(val packageName: String) : BlockReason() {
@@ -10,9 +8,12 @@ sealed class BlockReason {
         }
     }
 
-    data class TryingToDisable(val root: AccessibilityNodeInfo) : BlockReason() {
+    data class TryingToDisable(
+        val codeName: String,
+        val screenAnalysis: ScreenAnalysis
+    ) : BlockReason() {
         override fun getName(): String {
-            return "محاولة تعطيل المراقبة"
+            return "محاولة تعطيل التطبيق:  \n$codeName"
         }
     }
 }

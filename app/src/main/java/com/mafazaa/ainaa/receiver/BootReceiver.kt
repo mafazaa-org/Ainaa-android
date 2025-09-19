@@ -7,6 +7,7 @@ import com.mafazaa.ainaa.Lg
 import com.mafazaa.ainaa.data.FakeFileRepo
 import com.mafazaa.ainaa.hasAccessibilityPermission
 import com.mafazaa.ainaa.hasVpnPermission
+import com.mafazaa.ainaa.isKeyguardSecure
 import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
 import com.mafazaa.ainaa.startVpnService
 
@@ -19,7 +20,10 @@ class BootReceiver: BroadcastReceiver() {
         ) {
             return
         }
-        Lg.fileRepo = FakeFileRepo
+        if (!context.isKeyguardSecure()) {
+            Lg.fileRepo = FakeFileRepo
+            Lg.w(TAG, "Device is not secure, logging disabled")
+        }
         Lg.i(TAG, "Device :${intent.action}")
         if (context.hasAccessibilityPermission()) {
             context.startAccessibilityService()

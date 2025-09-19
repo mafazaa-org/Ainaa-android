@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
+    android:background="@color/white"
     android:gravity="center"
+    android:orientation="vertical"
 
-    android:background="@color/white">
+    android:padding="16dp">
     <!-- Title -->
 
 
@@ -21,6 +21,7 @@
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:padding="16dp">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -30,6 +31,7 @@
             android:textColor="#000000"
             android:textSize="18sp"
             android:textStyle="bold" />
+
         <TextView
             android:id="@+id/reasonTextView"
             android:layout_width="wrap_content"
@@ -41,27 +43,26 @@
             tools:text="Reason for blocking" />
 
         <TextView
-            android:id="@+id/section1Title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="🎉 الدعم المادي"
-            android:visibility="gone"
-
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/section1Desc"
-            android:layout_width="wrap_content"
-            android:visibility="gone"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:gravity="center"
-            android:text="مساهمتك المالية تمكننا من تطوير خدماتنا، تحسين الحماية، وتقديم مزايا جديدة للجميع. حتى المساهمة البسيطة تحدث فرقاً كبيراً!"
+            android:text="إذا كنت تعتقد أن هذا خطأ، شارك ملف السجل معنا وتواصل معنا"
             android:textColor="#555555"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/shareLogTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="مشاركة ملف السجل"
+            android:textColor="@color/red"
+
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
 
         <Button
             android:id="@+id/closeBtn"

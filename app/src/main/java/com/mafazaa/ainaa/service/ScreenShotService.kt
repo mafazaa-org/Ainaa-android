@@ -91,9 +91,9 @@ class ScreenShotService : Service(), LifecycleOwner, SavedStateRegistryOwner {
                             )
                         },
                         onClose = { closeOverlay() },
-                        onScreenShot = {
+                        onScreenShot = {d->
                             serviceScope.launch {
-                                delay(2000)
+                                delay(d)
                                 startAccessibilityService(MyAccessibilityService.ACTION_SHARE_CURRENT_SCREEN)
                             }
                         })

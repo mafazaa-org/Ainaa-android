@@ -1,8 +1,8 @@
 package com.mafazaa.ainaa
 
 import android.util.Log
-import android.view.accessibility.AccessibilityNodeInfo
 import com.mafazaa.ainaa.data.FakeFileRepo
+import com.mafazaa.ainaa.model.ScreenAnalysis
 import com.mafazaa.ainaa.model.FileRepo
 import java.io.File
 
@@ -52,12 +52,26 @@ object Lg {
         return res
     }
 
-    fun logUiTree(root: AccessibilityNodeInfo): File {
-        val pkg = root.packageName ?: "unknown"
-        val fileName = "ui_tree$pkg.txt"
+    fun logUiTree(codeName:String,screenAnalysis: ScreenAnalysis): File {
+        val pkg = screenAnalysis.pkg ?: "unknown"
+        val fileName = "$codeName.txt"
         val logFile = fileRepo.getLogFile(fileName)
         fileRepo.wipeLog(fileName)
-        fileRepo.saveToLog(dumpTreeToString(root), fileName)
+        fileRepo.saveToLog((screenAnalysis).toString(), fileName)
         return logFile
+    }
+
+    fun logWithInfo(packageName:String): File {//todo log the reason
+        val fileName = "$packageName.txt"
+        val logFile = fileRepo.getLogFile(fileName)
+        fileRepo.wipeLog(fileName)
+        val info = buildString {
+            append("Package: $packageName\n")
+            append("Log file size: ${fileRepo.getLogSize()} bytes\n")
+            append("Time: ${android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", System.currentTimeMillis())}\n")
+        }
+        fileRepo.saveToLog(info, fileName)
+        return logFile
+
     }
 }
