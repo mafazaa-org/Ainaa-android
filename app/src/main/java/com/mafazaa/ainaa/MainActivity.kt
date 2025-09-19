@@ -1,30 +1,48 @@
 package com.mafazaa.ainaa
 
-import android.Manifest.permission.*
-import android.content.*
-import android.os.*
-import android.widget.*
-import androidx.activity.*
-import androidx.activity.compose.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.platform.*
-import androidx.core.net.*
-import androidx.navigation3.runtime.*
-import androidx.navigation3.ui.*
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.mafazaa.ainaa.Constants.contactSupportUrl
 import com.mafazaa.ainaa.Constants.joinUrl
 import com.mafazaa.ainaa.Constants.safeSearchUrl
 import com.mafazaa.ainaa.Constants.supportUrl
 import com.mafazaa.ainaa.data.local.LocalData
 import com.mafazaa.ainaa.data.remote.NetworkResult
-import com.mafazaa.ainaa.model.*
-import com.mafazaa.ainaa.service.*
+import com.mafazaa.ainaa.model.AppInfo
+import com.mafazaa.ainaa.model.ProtectionLevel
+import com.mafazaa.ainaa.model.UpdateState
+import com.mafazaa.ainaa.service.MyAccessibilityService
 import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
-import com.mafazaa.ainaa.ui.*
+import com.mafazaa.ainaa.service.MyVpnService
+import com.mafazaa.ainaa.service.ScreenShotService
+import com.mafazaa.ainaa.ui.BottomBar
+import com.mafazaa.ainaa.ui.Screen
+import com.mafazaa.ainaa.ui.TopBar
 import com.mafazaa.ainaa.ui.dialog.BlockAppDialog
 import com.mafazaa.ainaa.ui.dialog.ConfirmDeleteDialog
 import com.mafazaa.ainaa.ui.dialog.EnableProtectionDialog
@@ -35,8 +53,8 @@ import com.mafazaa.ainaa.ui.dialog.ReportProblemDialog
 import com.mafazaa.ainaa.ui.enable_pro.EnableProtectionScreen
 import com.mafazaa.ainaa.ui.pro_activated.ProtectionActivatedScreen
 import com.mafazaa.ainaa.ui.support.SupportScreen
-import com.mafazaa.ainaa.ui.theme.*
-import org.koin.androidx.viewmodel.ext.android.*
+import com.mafazaa.ainaa.ui.theme.AinaaTheme
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.java.KoinJavaComponent.inject
 
 // Sealed dialog state to manage all dialogs from a single source of truth
@@ -268,6 +286,24 @@ class MainActivity: ComponentActivity() {
                                 onBlockAppClick = { dialogState = DialogState.BlockApps() },
                                 onReportClick = { dialogState = DialogState.ReportProblem },
                                 onConfirmProtectionClick = { dialogState = DialogState.HowItWorks },
+                                onUpdateClick = { updateStatus ->
+                                    when (updateStatus) {
+                                        UpdateState.Downloaded -> {
+                                            context.installApk(viewModel.updateFile())
+                                        }
+
+                                        is UpdateState.Failed,
+                                        UpdateState.NoUpdate,
+                                            -> {
+                                            viewModel.handleUpdateStatus()
+                                        }
+
+                                        else -> {
+                                        }
+                                    }
+
+                                },
+                                updateState = viewModel.updateState.value,
                             )
                         }
 

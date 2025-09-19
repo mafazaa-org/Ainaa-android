@@ -8,6 +8,7 @@ object Constants {
     const val joinUrl = "https://www.mafazaa.com/join"
     const val contactSupportUrl="https://ainaa.mafazaa.com/support"
     const val safeSearchUrl ="https://google.com/safesearch"
+    const val releaseApkName = "ainaa"
     const val maxNodes = 1000//todo
     val defaultCodes: List<ScriptCode> = listOf(
         ScriptCode(

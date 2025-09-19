@@ -1,17 +1,32 @@
 package com.mafazaa.ainaa.ui.pro_activated
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.text.font.*
-import androidx.compose.ui.text.style.*
-import androidx.compose.ui.unit.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.mafazaa.ainaa.model.UpdateState
 import com.mafazaa.ainaa.ui.comp.ReportLink
-import com.mafazaa.ainaa.ui.theme.*
+import com.mafazaa.ainaa.ui.comp.TowColorText
+import com.mafazaa.ainaa.ui.theme.red
 
 @Composable
 fun ProtectionActivatedScreen(
@@ -19,8 +34,8 @@ fun ProtectionActivatedScreen(
     onBlockAppClick: () -> Unit,
     onReportClick: () -> Unit,
     onConfirmProtectionClick: () -> Unit,
-    // onUpdateClick: (updateState: UpdateState) -> Unit = { /* Default no-op */ },
-    // updateState: UpdateState = UpdateState.NoUpdate,
+    onUpdateClick: (updateState: UpdateState) -> Unit = { /* Default no-op */ },
+    updateState: UpdateState = UpdateState.NoUpdate,
 
     ) {
     Column(
@@ -85,7 +100,6 @@ fun ProtectionActivatedScreen(
         }
         ReportLink(onReportClick = onReportClick)
         Spacer(modifier = Modifier.height(16.dp))
-        /* Temporarily commented out update-related code
         val (black, red) = when (updateState) {
             UpdateState.NoUpdate -> Pair("لا يوجد تحديث متاح", "اضغط للتحقق")
             UpdateState.Checking -> Pair("جاري التحقق من وجود تحديثات", "")
@@ -95,7 +109,6 @@ fun ProtectionActivatedScreen(
         }
 
         TowColorText(black = black, red = red, onClick = { onUpdateClick(updateState) })
-        */
 
     }
 }

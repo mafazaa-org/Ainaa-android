@@ -24,4 +24,8 @@ class RealFileRepo(val context: Context): FileRepo {
         val logFile = getLogFile(fileName)
         logFile.appendText(content)
     }
+    override fun getUpdateFile(): File = File(
+        context.filesDir,
+        "update.apk"
+    )
 }

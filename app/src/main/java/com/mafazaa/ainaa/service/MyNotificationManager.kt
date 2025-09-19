@@ -13,6 +13,7 @@ object MyNotificationManager {
     const val SERVICE_CHANNEL_ID = "ainaa"
     const val UPDATE_CHANNEL_ID = "ainaa_update"
     const val SERVICE_ID = 1
+    const val UPDATE_ID = 2
     var notificationChannelCreated = false
     fun createNotificationChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -51,5 +52,18 @@ object MyNotificationManager {
             .build()
         service.startForeground(SERVICE_ID, notification)
     }
-
+    fun showUpdateNotification(context: Context) {
+        if (!notificationChannelCreated) {
+            createNotificationChannels(context)
+        }
+        val notification = NotificationCompat.Builder(context, UPDATE_CHANNEL_ID)
+            .setContentTitle("إصدار جديد متوفر")
+            .setContentText("هناك إصدار جديد من تطبيق عيناً متوفر، يرجى التحديث إلى آخر إصدار لتحسين تجربتك.")
+            .setSmallIcon(R.drawable.ic_red)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(false)
+            .build()
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.notify(UPDATE_ID, notification)
+    }
 }

@@ -4,12 +4,19 @@ import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.content.ContextCompat
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.mafazaa.ainaa.data.local.LocalData
 import com.mafazaa.ainaa.model.FileRepo
 import com.mafazaa.ainaa.receiver.BootReceiver
+import com.mafazaa.ainaa.service.DailyNotificationWorker
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
+import java.util.concurrent.TimeUnit
 
 class MyApp: Application() {
     override fun onCreate() {
@@ -52,6 +59,26 @@ class MyApp: Application() {
             filter,
             ContextCompat.RECEIVER_EXPORTED
         )
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
+            .setRequiresBatteryNotLow(false)
+            .setRequiresCharging(false)
+            .build()
+
+        val dailyWorkRequest =
+            PeriodicWorkRequestBuilder<DailyNotificationWorker>(
+                1,
+                TimeUnit.DAYS
+            ) // minimum interval for testing
+                .setConstraints(constraints)
+                .build()
+
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "DailyNotificationWork",
+                ExistingPeriodicWorkPolicy.KEEP,
+                dailyWorkRequest
+            )
 
     }
 

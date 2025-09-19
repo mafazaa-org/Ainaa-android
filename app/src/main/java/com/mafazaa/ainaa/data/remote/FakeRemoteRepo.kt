@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 object FakeRemoteRepo: RemoteRepo by KtorRepo() {
+
     override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<NetworkResult> = flow {
         emit(NetworkResult.Loading)
         delay(200)
