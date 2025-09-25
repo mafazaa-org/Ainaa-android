@@ -10,7 +10,7 @@ import com.mafazaa.ainaa.model.repo.UpdateRepo
 import com.mafazaa.ainaa.service.MyNotificationManager.showUpdateNotification
 import org.koin.java.KoinJavaComponent.inject
 
-class DailyNotificationWorker(
+class DailyUpdateNotificationWorker(
     val context: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {

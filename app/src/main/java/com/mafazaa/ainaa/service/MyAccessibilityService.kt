@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
-import android.view.accessibility.AccessibilityNodeInfo
 import com.mafazaa.ainaa.Lg
 import com.mafazaa.ainaa.Lg.logUiTree
 import com.mafazaa.ainaa.R
@@ -28,9 +27,9 @@ import kotlin.time.measureTimedValue
 
 @SuppressLint("AccessibilityPolicy")
 class MyAccessibilityService : AccessibilityService() {
-    lateinit var overlay: OverlayManager
+    lateinit var overlay: LockOverlayManager
     private val serviceScope = CoroutineScope(Dispatchers.Default + Job())
-    lateinit var overlayManager: OverlayManager
+    lateinit var lockOverlayManager: LockOverlayManager
     private var blockedApps = emptySet<String>()
     private val localData: LocalData by inject(LocalData::class.java)
     private val scriptRepo: ScriptRepo by inject(ScriptRepo::class.java)
@@ -64,12 +63,12 @@ class MyAccessibilityService : AccessibilityService() {
 
     override fun onCreate() {
         super.onCreate()
-        overlayManager = inject<OverlayManager>(OverlayManager::class.java).value
+        lockOverlayManager = inject<LockOverlayManager>(LockOverlayManager::class.java).value
         overlay =
-            OverlayManager(this) // This seems redundant as overlayManager is already initialized.
+            LockOverlayManager(this) // This seems redundant as overlayManager is already initialized.
 
         if (blockedApps.isEmpty() && isKeyguardSecure()) {
-            blockedApps = localData.apps
+            blockedApps = localData.blockedApps
             Lg.d(TAG, "Loaded blocked apps: ")
 
 
@@ -88,52 +87,58 @@ class MyAccessibilityService : AccessibilityService() {
 
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        // Return early if event is null or service is not running
         event ?: return
-        if (!isRunning)
-            return
+        if (!isRunning) return
+        // Only handle window content changed events
+        if (event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) return
 
-        if (
-            event.eventType != AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-        ) return
-
-        rootInActiveWindow?.let { rootInActiveWindow ->
+        rootInActiveWindow?.let { rootNode ->
             serviceScope.launch {
-                val (screenAnalysis, t) = measureTimedValue {
-                    ScreenAnalyser.analyzeScreen(rootInActiveWindow, getString(R.string.app_name))
+                // Analyze the current screen and measure the time taken
+                val (analysisResult, analysisDuration) = measureTimedValue {
+                    ScreenAnalyser.analyzeScreen(rootNode, getString(R.string.app_name))
                 }
-                Lg.d(
+                Log.d(
                     TAG,
-                    "Screen analyzed in ${t.inWholeMilliseconds} nodes=${screenAnalysis.nodesCount}"
+                    "Screen analyzed in ${analysisDuration.inWholeMilliseconds}ms, nodes=${analysisResult.nodesCount}"
                 )
-                val pkg = screenAnalysis.pkg
-                if (checkBlockedApp(pkg)) {
-                    Lg.i(TAG, "Blocked app in use: $pkg")
-                    block(BlockReason.UsingBlockedApp(pkg ?: "unknown"))
+                val currentPackage = analysisResult.pkg
+                if (checkBlockedApp(currentPackage)) {
+                    Lg.i(TAG, "Blocked app in use: $currentPackage")
+                    block(BlockReason.UsingBlockedApp(currentPackage ?: "unknown"))
                     return@launch
                 }
-                val (res, t2) = measureTimedValue { scriptRepo.evaluate(screenAnalysis) }
-                Log.d(TAG, "Script evaluated in ${t2.inWholeMilliseconds} ")
-                when (res) {
+                // Evaluate scripts and measure the time taken
+                val (scriptResult, scriptEvalDuration) = measureTimedValue {
+                    scriptRepo.evaluate(
+                        analysisResult
+                    )
+                }
+                Log.d(TAG, "Script evaluated in ${scriptEvalDuration.inWholeMilliseconds}ms")
+                when (scriptResult) {
                     is ScriptResult.Error -> {
-                        Lg.e(TAG, "Script evaluation error: ${res.error}")
-
+                        Lg.e(TAG, "Script evaluation error: ${scriptResult.error}")
                     }
 
                     is ScriptResult.Success -> {
-                        if (res.matched) {
+                        if (scriptResult.matched) {
                             Lg.i(
                                 TAG,
-                                "Blocking due to script match: ${res.scriptName} on ${screenAnalysis.pkg}"
+                                "Blocking due to script match: ${scriptResult.scriptName} on ${analysisResult.pkg}"
                             )
-                            block(BlockReason.TryingToDisable(res.scriptName, screenAnalysis))
+                            block(
+                                BlockReason.TryingToDisable(
+                                    scriptResult.scriptName,
+                                    analysisResult
+                                )
+                            )
                             return@launch
                         }
                     }
                 }
             }
         }
-
-
     }
 
 
@@ -144,7 +149,7 @@ class MyAccessibilityService : AccessibilityService() {
 
     private fun block(reason: BlockReason) {
         serviceScope.launch(Dispatchers.Main) {
-            overlayManager.showOverlay(reason)
+            lockOverlayManager.showOverlay(reason)
         }
         performGlobalAction(GLOBAL_ACTION_BACK)
     }
@@ -158,9 +163,9 @@ class MyAccessibilityService : AccessibilityService() {
             startService(intent)
         }
 
-        val ACTION_STOP = "STOP_ACCESSIBILITY"
-        val ACTION_START = "START_ACCESSIBILITY"
-        val ACTION_SHARE_CURRENT_SCREEN = "SHARE_CURRENT_SCREEN"
+        const val ACTION_STOP = "STOP_ACCESSIBILITY"
+        const val ACTION_START = "START_ACCESSIBILITY"
+        const val ACTION_SHARE_CURRENT_SCREEN = "SHARE_CURRENT_SCREEN"
         var isRunning = false
         const val TAG = "MyAccessibilityService"
     }

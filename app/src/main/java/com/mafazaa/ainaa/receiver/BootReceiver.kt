@@ -11,7 +11,7 @@ import com.mafazaa.ainaa.isKeyguardSecure
 import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
 import com.mafazaa.ainaa.startVpnService
 
-class BootReceiver: BroadcastReceiver() {
+class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
@@ -20,9 +20,10 @@ class BootReceiver: BroadcastReceiver() {
         ) {
             return
         }
+
         if (!context.isKeyguardSecure()) {
             Lg.fileRepo = FakeFileRepo
-            Lg.w(TAG, "Device is not secure, logging disabled")
+            Lg.w(TAG, "Device is not encrypted, logging disabled")
         }
         Lg.i(TAG, "Device :${intent.action}")
         if (context.hasAccessibilityPermission()) {

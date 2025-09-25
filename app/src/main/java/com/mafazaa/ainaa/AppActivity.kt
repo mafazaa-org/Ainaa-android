@@ -33,21 +33,21 @@ import com.mafazaa.ainaa.Constants.safeSearchUrl
 import com.mafazaa.ainaa.Constants.supportUrl
 import com.mafazaa.ainaa.data.local.LocalData
 import com.mafazaa.ainaa.data.remote.NetworkResult
-import com.mafazaa.ainaa.model.AppInfo
-import com.mafazaa.ainaa.model.ProtectionLevel
+import com.mafazaa.ainaa.model.DnsProtectionLevel
 import com.mafazaa.ainaa.model.UpdateState
 import com.mafazaa.ainaa.service.MyAccessibilityService
 import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
 import com.mafazaa.ainaa.service.MyVpnService
 import com.mafazaa.ainaa.service.ScreenShotService
+import com.mafazaa.ainaa.ui.AppInfo
 import com.mafazaa.ainaa.ui.BottomBar
 import com.mafazaa.ainaa.ui.Screen
 import com.mafazaa.ainaa.ui.TopBar
+import com.mafazaa.ainaa.ui.comp.OkDialog
 import com.mafazaa.ainaa.ui.dialog.BlockAppDialog
-import com.mafazaa.ainaa.ui.dialog.ConfirmDeleteDialog
+import com.mafazaa.ainaa.ui.dialog.ConfirmBlockedDialog
 import com.mafazaa.ainaa.ui.dialog.EnableProtectionDialog
 import com.mafazaa.ainaa.ui.dialog.HowItWorksDialog
-import com.mafazaa.ainaa.ui.dialog.OkDialog
 import com.mafazaa.ainaa.ui.dialog.PermissionDialog
 import com.mafazaa.ainaa.ui.dialog.ReportProblemDialog
 import com.mafazaa.ainaa.ui.enable_pro.EnableProtectionScreen
@@ -66,10 +66,11 @@ sealed interface DialogState {
     // Keeps Block Apps dialog open, and optionally shows a nested confirm dialog for a selected app
     data class BlockApps(val confirmApp: AppInfo? = null) : DialogState
     data object HowItWorks : DialogState
-    data class EnableProtectionConfirm(val level: ProtectionLevel, val phone: String) : DialogState
+    data class EnableProtectionConfirm(val level: DnsProtectionLevel, val phone: String) :
+        DialogState
 }
 
-class MainActivity: ComponentActivity() {
+class AppActivity : ComponentActivity() {
     private var vpnPermission by mutableStateOf(false)
     private var overlayPermission by mutableStateOf(false)
     private var usageStatsPermission by mutableStateOf(false)
@@ -80,9 +81,9 @@ class MainActivity: ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel: MainViewModel = getViewModel()
+        val viewModel: AppViewModel = getViewModel()
         val localData: LocalData by inject(LocalData::class.java)
-        viewModel.loadInstalledApps(getAllApps(this))
+        viewModel.loadInstalledApps(getAllApps())
         Lg.i(TAG, "Opening app")
         //viewModel.handleUpdateStatus(this)
         refreshPermissionState()
@@ -99,7 +100,7 @@ class MainActivity: ComponentActivity() {
 
     @Composable
     private fun MainRoot(
-        viewModel: MainViewModel,
+        viewModel: AppViewModel,
         localData: LocalData,
     ) {
         val snackbarHostState = remember { SnackbarHostState() }
@@ -183,7 +184,7 @@ class MainActivity: ComponentActivity() {
                     }
                 )
                 if (d.confirmApp != null) {
-                    ConfirmDeleteDialog(
+                    ConfirmBlockedDialog(
                         app = d.confirmApp,
                         onDismiss = { dialogState = DialogState.BlockApps() },
                         onConfirm = {
@@ -218,8 +219,6 @@ class MainActivity: ComponentActivity() {
                                     viewModel.savePhoneNumber(d.phone)
                                     viewModel.saveLevel(d.level)
                                     startAccessibilityService()
-                                    localData.activatedVpn = true
-                                    ScreenShotService.start(context)
                                     context.startVpnService()
                                     backStack.add(Screen.ProtectionActivated)
                                     backStack.remove(Screen.EnableProtection)
@@ -311,18 +310,22 @@ class MainActivity: ComponentActivity() {
                             SupportScreen(
                                 onSupportClick = { openUrl(supportUrl) },
                                 onJoinClick = { openUrl(joinUrl) },
-                                onShareLogFile = { this@MainActivity.shareFile(viewModel.getLogFile()) },
-                                onStopBlocking = { startAccessibilityService(MyAccessibilityService.ACTION_STOP) }
+                                onShareLogFile = { this@AppActivity.shareFile(viewModel.getLogFile()) },
+                                onStopBlocking = { startAccessibilityService(MyAccessibilityService.ACTION_STOP) },
+                                onOpenScreenShotWindow = {
+                                    ScreenShotService.start(context)
+
+                                }
                             )
                         }
 
                         Screen.EnableProtection -> NavEntry(key) {
-                            var selectedLevel by remember { mutableStateOf(ProtectionLevel.LOW) }
+                            var selectedLevel by remember { mutableStateOf(DnsProtectionLevel.LOW) }
                             var phoneNumber by remember { mutableStateOf("") }
 
                             EnableProtectionScreen(
                                 report = { dialogState = DialogState.ReportProblem },
-                                enableProtection = { level: ProtectionLevel, phone: String ->
+                                enableProtection = { level: DnsProtectionLevel, phone: String ->
                                     selectedLevel = level
                                     phoneNumber = phone
                                     when {

@@ -1,11 +1,9 @@
 package com.mafazaa.ainaa.data.remote
 
-// import android.util.Log
-// import com.mafazaa.ainaa.*
 import android.util.Log
 import com.mafazaa.ainaa.Constants
-import com.mafazaa.ainaa.model.Report
-import com.mafazaa.ainaa.model.Version
+import com.mafazaa.ainaa.model.ReportDto
+import com.mafazaa.ainaa.model.VersionDto
 import com.mafazaa.ainaa.model.repo.RemoteRepo
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
@@ -32,26 +30,31 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import java.io.File
 
-// import kotlinx.serialization.json.*
-// import kotlinx.serialization.json.Json.Default.parseToJsonElement
-// import java.io.*
 
-class KtorRepo: RemoteRepo {
+class KtorRepo : RemoteRepo {
 
-    val phoneNumberFormUrl = "https://docs.google.com/forms/d/1SisfmhFyuSPjafRb3UKf66QBgjO83Bcxc7DfIkddRiM/formResponse ";
+    val phoneNumberFormUrl =
+        "https://docs.google.com/forms/d/1SisfmhFyuSPjafRb3UKf66QBgjO83Bcxc7DfIkddRiM/formResponse "
     val phoneNumberEntryId = "entry.1388739102" // Your Entry ID
 
     val reportProblemFormUrl =
         "https://docs.google.com/forms/d/e/1FAIpQLSfnspR0eAjWtYKbweOQSAOrq2OWR8dkvyEy_uj0XokrNiHnPw/formResponse"
-    val reportNameEntryId = "entry.654511892";
-    val reportPhoneNumberEntryId = "entry.1692603949";
-    val reportEmailEntryId = "entry.742958279";
-    val reportProblemEntryId = "entry.1462277143";
+    val reportNameEntryId = "entry.654511892"
+    val reportPhoneNumberEntryId = "entry.1692603949"
+    val reportEmailEntryId = "entry.742958279"
+    val reportProblemEntryId = "entry.1462277143"
 
     val latestVersionUrl =
         "https://api.github.com/repos/mafazaa-org/Ainaa-android/releases/latest"
 
-    override suspend fun getLatestVersion(): Version? {
+    /**
+     * IMPORTANT:
+     * we here make two assumptions:
+     * 1. version code is an integer and is derived from the tag name by removing
+     * the 'v' prefix. e.g. v23 -> 23
+     * 2. the apk asset in the release contains the `Constants.releaseApkName`
+     */
+    override suspend fun getLatestVersion(): VersionDto? {
         return try {
             val client = HttpClient(Android)
             val response: HttpResponse =
@@ -71,7 +74,7 @@ class KtorRepo: RemoteRepo {
                 downloadAsset?.get("browser_download_url")?.jsonPrimitive?.content.orEmpty()
             val size = downloadAsset?.get("size")?.jsonPrimitive?.longOrNull ?: 0L
             val version = tagName.removePrefix("v").toInt()
-            return Version(version, name, downloadUrl, body, size)
+            return VersionDto(version, name, downloadUrl, body, size)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -123,16 +126,16 @@ class KtorRepo: RemoteRepo {
         }
     }
 
-    override fun submitReportToGoogleForm(report: Report): Flow<NetworkResult> = flow {
+    override fun submitReportToGoogleForm(reportDto: ReportDto): Flow<NetworkResult> = flow {
         emit(NetworkResult.Loading)
         try {
             val response: HttpResponse = client.post(reportProblemFormUrl) {
                 contentType(ContentType.Application.FormUrlEncoded)
                 setBody(Parameters.build {
-                    append(reportNameEntryId, report.name)
-                    append(reportPhoneNumberEntryId, report.phone)
-                    append(reportEmailEntryId, report.email)
-                    append(reportProblemEntryId, report.problem)
+                    append(reportNameEntryId, reportDto.name)
+                    append(reportPhoneNumberEntryId, reportDto.phone)
+                    append(reportEmailEntryId, reportDto.email)
+                    append(reportProblemEntryId, reportDto.problem)
                 }.formUrlEncode())
             }
 
@@ -148,9 +151,10 @@ class KtorRepo: RemoteRepo {
     }
 }
 
+//useful for quick testing
 suspend fun main() {
     val repo = KtorRepo()
-    repo.submitReportToGoogleForm(Report("f","f","f","f")).collect {
+    repo.submitReportToGoogleForm(ReportDto("f", "f", "f", "f")).collect {
         println(it)
     }
 }

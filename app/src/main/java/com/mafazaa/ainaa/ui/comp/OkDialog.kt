@@ -1,4 +1,4 @@
-package com.mafazaa.ainaa.ui.dialog
+package com.mafazaa.ainaa.ui.comp
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
+/**
+ * A simple dialog with a title, message, and an "OK" button to dismiss.
+ */
 @Composable
 fun OkDialog(
     modifier: Modifier = Modifier,

@@ -1,37 +1,32 @@
 package com.mafazaa.ainaa.model
 
-data class  ScreenAnalysis (
+data class ScreenAnalysis(
+    /**
+     * the package name of the app currently in foreground
+     */
     val pkg: String?,
-    val appName : String,
-    val nodesCount : Int,
-    val root:ScreenNode,
+    /**
+     * our app name . i added it so i can pass it to the script engine (js)
+     */
+    val appName: String,
+    val nodesCount: Int,
+    /**
+     * true if any of the nodes text contains our app name
+     * a utility field to help the script engine (js) to work faster
+     * instead of searching for the app name in all the nodes texts
+     */
     val hasAppName: Boolean,
-    val isSettingsScreen :Boolean
-){
+    /**
+     * true if the current screen belongs to a settings app
+     * a utility field also
+     */
+    val isSettingsScreen: Boolean,
+    val root: ScreenNode,
+) {
     override fun toString(): String {
-        return "nodes:$nodesCount, app:$pkg, has our app name:$hasAppName,is a settings screen:$isSettingsScreen"+
-                "\n"+ root.toString()
+        return "nodes:$nodesCount, app:$pkg, has our app name:$hasAppName,is a settings screen:$isSettingsScreen" +
+                "\n" + root.toString()
     }
 }
 
-data class ScreenNode (
-    val cls: String?,
-    val text: String?,
-    val id: String?,
-    val desc: String?,
-    val children: List<ScreenNode> = emptyList()
-){
-    override fun toString(): String {//consider this as root
-        return toString(0)
-    }
-     fun toString(level :Int): String {
-        val indent = "  ".repeat(level)
-        val sb = StringBuilder()
-        sb.append("$indent- cls: $cls, text: $text, id: $id, desc: $desc\n")
-        for (child in children) {
-            sb.append(child.toString(level + 1))
-        }
-        return sb.toString()
-    }
 
-}

@@ -1,6 +1,9 @@
-package com.mafazaa.ainaa
+package com.mafazaa.ainaa.di
 
 import android.content.Context.MODE_PRIVATE
+import com.mafazaa.ainaa.AppViewModel
+import com.mafazaa.ainaa.BuildConfig
+import com.mafazaa.ainaa.Constants
 import com.mafazaa.ainaa.data.JsEngine
 import com.mafazaa.ainaa.data.RealFileRepo
 import com.mafazaa.ainaa.data.UpdateManager
@@ -11,7 +14,7 @@ import com.mafazaa.ainaa.model.FileRepo
 import com.mafazaa.ainaa.model.repo.RemoteRepo
 import com.mafazaa.ainaa.model.repo.ScriptRepo
 import com.mafazaa.ainaa.model.repo.UpdateRepo
-import com.mafazaa.ainaa.service.OverlayManager
+import com.mafazaa.ainaa.service.LockOverlayManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -21,12 +24,16 @@ val appModule = module {
     single<RemoteRepo> { if (BuildConfig.DEBUG) FakeRemoteRepo else KtorRepo() }
     single<LocalData> { LocalData(androidContext().getSharedPreferences("App", MODE_PRIVATE)) }
     single<FileRepo> { RealFileRepo(androidContext()) }
-    single<OverlayManager> { OverlayManager(androidContext()) }
-    single<ScriptRepo> { JsEngine().apply {  setCodes(
-        Constants.defaultCodes
-    ) }}
+    single<LockOverlayManager> { LockOverlayManager(androidContext()) }
+    single<ScriptRepo> {
+        JsEngine().apply {
+            setCodes(
+                Constants.defaultCodes
+            )
+        }
+    }
     single<UpdateRepo> { UpdateManager(get(), get(), get()) }
 
-    viewModel { MainViewModel(get(), get(), get(), get()) }
+    viewModel { AppViewModel(get(), get(), get(), get()) }
 
 }

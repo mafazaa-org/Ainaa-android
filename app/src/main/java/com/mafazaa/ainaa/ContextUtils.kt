@@ -15,13 +15,14 @@ import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import com.mafazaa.ainaa.model.ScreenAnalysis
-import com.mafazaa.ainaa.model.ScreenNode
-import com.mafazaa.ainaa.model.AppInfo
 import com.mafazaa.ainaa.service.MyAccessibilityService
 import com.mafazaa.ainaa.service.MyVpnService
+import com.mafazaa.ainaa.ui.AppInfo
 import java.io.File
 
+/*
+ * Context extension functions for various utilities.
+ */
 fun Context.installApk(apkFile: File) {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -39,6 +40,7 @@ fun Context.installApk(apkFile: File) {
         Lg.e("InstallApk", "Error starting install", e)
     }
 }
+
 fun Context.startVpnService() {
 
     val intent = Intent(this, MyVpnService::class.java).apply {
@@ -48,11 +50,13 @@ fun Context.startVpnService() {
     ContextCompat.startForegroundService(this, intent)
     MyVpnService.isRunning = true
 }
+
 fun Context.openUrl(url: String) {
     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
     intent.addCategory(Intent.CATEGORY_BROWSABLE)
     startActivity(intent)
 }
+
 fun Context.hasOverlayPermission(): Boolean = canDrawOverlays(this)
 fun Context.hasUsageStatsPermission(): Boolean {
     val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
@@ -101,6 +105,7 @@ fun ComponentActivity.requestUsageStatsPermission() {
     val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
     startActivity(intent)
 }
+
 fun Context.hasAccessibilityPermission(): Boolean {
     val am =
         getSystemService(Context.ACCESSIBILITY_SERVICE) as android.view.accessibility.AccessibilityManager
@@ -141,24 +146,9 @@ fun Context.shareFile(logFile: File) {
     })
 }
 
-fun dumpTreeToString(screen: ScreenAnalysis): String {
-    val sb = StringBuilder()
-    sb.append("Package: ${screen.pkg}\n")
-    sb.append("Nodes count: ${screen.nodesCount}\n")
-    sb.append("Has app name: ${screen.hasAppName}\n")
-    fun dumpNode(node: ScreenNode, indent: String) {
-        sb.append("$indent Node: cls=${node.cls}, text=${node.text}, id=${node.id}, desc=${node.desc}\n")
-        for (child in node.children) {
-             dumpNode(node, "$indent  ")
-        }
-    }
-    dumpNode(screen.root, "")
-    return sb.toString()
-
-}
-fun getAllApps(context: Context): List<AppInfo> {
+fun Context.getAllApps(): List<AppInfo> {
     val apps = mutableListOf<AppInfo>()
-    val packageManager = context.packageManager
+    val packageManager = this.packageManager
     val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
 
     for (applicationInfo in packages) {

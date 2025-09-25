@@ -10,15 +10,16 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.mafazaa.ainaa.data.local.LocalData
+import com.mafazaa.ainaa.di.appModule
 import com.mafazaa.ainaa.model.FileRepo
 import com.mafazaa.ainaa.receiver.BootReceiver
-import com.mafazaa.ainaa.service.DailyNotificationWorker
+import com.mafazaa.ainaa.service.DailyUpdateNotificationWorker
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 import java.util.concurrent.TimeUnit
 
-class MyApp: Application() {
+class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
@@ -28,10 +29,8 @@ class MyApp: Application() {
 
         val fileRepo: FileRepo = getKoin().get()
         Lg.fileRepo = fileRepo // set the file repo for logging
-        // firebaseRepo = FirebaseImpl()
-        // crashlytics = FirebaseCrashlytics.getInstance()
 
-        if (!isKeyguardSecure()) {
+        if (!isKeyguardSecure()) {//if the device is not encrypted
             val localData: LocalData = getKoin().get()
             if (localData.lastVersion == 0) {//first run
                 isFirstTime = true
@@ -48,17 +47,12 @@ class MyApp: Application() {
                 Lg.i(TAG, "App version is up to date: ${localData.lastVersion}")
             }
         }
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_BOOT_COMPLETED)
-            addAction(Intent.ACTION_LOCKED_BOOT_COMPLETED)
-            addAction(Intent.ACTION_REBOOT)
-        }
-        ContextCompat.registerReceiver(
-            this,
-            BootReceiver(),
-            filter,
-            ContextCompat.RECEIVER_EXPORTED
-        )
+        registerBootReceiver()
+        registerDailyUpdateNotification()
+
+    }
+
+    private fun registerDailyUpdateNotification() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
             .setRequiresBatteryNotLow(false)
@@ -66,7 +60,7 @@ class MyApp: Application() {
             .build()
 
         val dailyWorkRequest =
-            PeriodicWorkRequestBuilder<DailyNotificationWorker>(
+            PeriodicWorkRequestBuilder<DailyUpdateNotificationWorker>(
                 1,
                 TimeUnit.DAYS
             ) // minimum interval for testing
@@ -79,7 +73,20 @@ class MyApp: Application() {
                 ExistingPeriodicWorkPolicy.KEEP,
                 dailyWorkRequest
             )
+    }
 
+    private fun registerBootReceiver() {
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_BOOT_COMPLETED)
+            addAction(Intent.ACTION_LOCKED_BOOT_COMPLETED)
+            addAction(Intent.ACTION_REBOOT)
+        }
+        ContextCompat.registerReceiver(
+            this,
+            BootReceiver(),
+            filter,
+            ContextCompat.RECEIVER_EXPORTED
+        )
     }
 
     companion object {

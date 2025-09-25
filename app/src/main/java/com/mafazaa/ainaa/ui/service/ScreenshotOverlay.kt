@@ -27,7 +27,7 @@ fun ScreenshotOverlay(
         modifier
             .padding(8.dp)
             .background(
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .5f),
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .7f),
                 shape = MaterialTheme.shapes.large
             )
     ) {
@@ -36,8 +36,7 @@ fun ScreenshotOverlay(
         Icon(
             modifier = Modifier
                 .padding(4.dp)
-                .background(Color.Transparent)
-            ,
+                .background(Color.Transparent),
             painter = painterResource(id = R.drawable.drag_pan),
             contentDescription = "Close",
 
@@ -78,8 +77,5 @@ fun ScreenshotOverlay(
             contentDescription = "Close",
 
             )
-
-
-
     }
 }

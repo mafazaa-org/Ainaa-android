@@ -1,6 +1,8 @@
 package com.mafazaa.ainaa.data
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
+import com.mafazaa.ainaa.BuildConfig
 import com.mafazaa.ainaa.model.ScreenAnalysis
 import com.mafazaa.ainaa.model.ScriptCode
 import com.mafazaa.ainaa.model.ScriptResult
@@ -9,6 +11,16 @@ import org.mozilla.javascript.Context
 import org.mozilla.javascript.ContextFactory
 import org.mozilla.javascript.Scriptable
 
+/**
+ * JsEngine is a JavaScript execution engine for evaluating user-provided scripts
+ * against a screen analysis model. It uses Mozilla Rhino for JS execution and supports
+ * script timeouts and instruction limits for safety.
+ *
+ * @property useTimeout Whether to enforce a timeout/instruction limit on scripts.
+ * @property instructionLimit The maximum number of JS instructions allowed per script.
+ *
+ * Implements [ScriptRepo] for script management and evaluation.
+ */
 class JsEngine(
     private val useTimeout: Boolean = true,
     private val instructionLimit: Int = 50_000 // only used when useTimeout==true
@@ -17,20 +29,25 @@ class JsEngine(
     private val codes = mutableListOf<ScriptCode>()
     private val gson = Gson()
 
-    // Optional: install a custom ContextFactory that stops long-running scripts.
-    // If you set useTimeout=true, we'll init a custom factory for this engine instance.
+    /**
+     * Optional: Custom ContextFactory to enforce instruction limits and timeouts.
+     * If [useTimeout] is true, a custom factory is used for this engine instance.
+     */
     private val localFactory: ContextFactory? = if (useTimeout) {
         object : ContextFactory() {
-            // Called to create each Context
+            /**
+             * Called to create each Context. Sets instruction observer threshold and disables JIT.
+             */
             override fun makeContext(): Context {
                 val cx = super.makeContext()
-                // when the engine executes this many "instructions" Rhino calls observeInstructionCount
                 cx.instructionObserverThreshold = instructionLimit
-                // Required for Android - disable JIT/optimization
-                cx.optimizationLevel = -1
+                cx.optimizationLevel = -1 // Required for Android
                 return cx
             }
 
+            /**
+             * Called when the instruction limit is reached. Throws a timeout exception.
+             */
             override fun observeInstructionCount(cx: Context?, instructionCount: Int) {
                 throw ScriptTimeoutException("JS script exceeded instruction limit ($instructionLimit)")
             }
@@ -39,29 +56,47 @@ class JsEngine(
         }
     } else null
 
-
-
+    /**
+     * Sets the list of scripts to be evaluated by this engine.
+     * @param codes List of [ScriptCode] objects.
+     */
     override fun setCodes(codes: List<ScriptCode>) {
         this.codes.clear()
         this.codes.addAll(codes)
     }
 
+    /**
+     * Evaluates all loaded scripts against the provided [ScreenAnalysis].
+     * Returns [ScriptResult.Success] if any script returns true, or [ScriptResult.Error] on failure.
+     *
+     * @param screenAnalysis The screen analysis data to expose to scripts.
+     * @return [ScriptResult] indicating the outcome of script evaluation.
+     */
     override fun evaluate(screenAnalysis: ScreenAnalysis): ScriptResult {
-        val cx: Context = try {
+        val cx: Context? = try {
             if (localFactory != null) {
                 localFactory.enterContext()
             } else {
                 Context.enter()
             }
         } catch (t: Throwable) {
-            throw RuntimeException("Failed to init JS engine: ${t.message}", t)
-        }.apply {
+            t.printStackTrace()
+            if (!BuildConfig.DEBUG) {
+                FirebaseCrashlytics.getInstance()
+                    .log("JsEngine: Context.enter() failed: ${t.message}")
+            }
+            null
+        }?.apply {
             optimizationLevel = -1
-
+        }
+        if (cx == null) {
+            return ScriptResult.Error("JS engine initialization failed")
         }
         return try {
+            // Initialize JS scope and inject helpers and screen data
             val scope: Scriptable = cx.initStandardObjects()
             val screenJson = gson.toJson(screenAnalysis)
+            // Injects a helper function for text search in the node tree
             cx.evaluateString(
                 scope,
                 """
@@ -92,7 +127,6 @@ class JsEngine(
                 null
             )
 
-
             // Put JSON string and parse it inside the JS context to get a proper JS object
             scope.put("screenJson", scope, Context.javaToJS(screenJson, scope))
             cx.evaluateString(scope, "var screen = JSON.parse(screenJson);", "initScreen", 1, null)
@@ -100,7 +134,6 @@ class JsEngine(
                 val scriptName = script.name
                 try {
                     val wrapped = script.code
-
                     val raw = cx.evaluateString(scope, wrapped, scriptName, 1, null)
                     val boolResult = jsValueToBoolean(raw)
                     if (boolResult) {
@@ -112,7 +145,7 @@ class JsEngine(
                     return ScriptResult.Error("Script '$scriptName' error: ${e.message}")
                 }
             }
-            // no script returned true
+            // No script returned true
             ScriptResult.Success("", false)
         } catch (e: Throwable) {
             ScriptResult.Error("JS engine error: ${e.message}")
@@ -125,6 +158,11 @@ class JsEngine(
         }
     }
 
+    /**
+     * Converts a raw JS value to a Boolean for script result evaluation.
+     * @param raw The JS value returned by the script.
+     * @return True if the value is considered truthy, false otherwise.
+     */
     private fun jsValueToBoolean(raw: Any?): Boolean {
         return when (raw) {
             null -> false
@@ -138,5 +176,8 @@ class JsEngine(
         }
     }
 
+    /**
+     * Exception thrown when a script exceeds the allowed instruction limit.
+     */
     class ScriptTimeoutException(message: String) : RuntimeException(message)
 }

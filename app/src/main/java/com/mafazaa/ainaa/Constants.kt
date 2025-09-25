@@ -3,13 +3,21 @@ package com.mafazaa.ainaa
 import com.mafazaa.ainaa.model.ScriptCode
 
 object Constants {
-    const val vpnAddress="10.0.0.2"
+    const val vpnAddress = "10.0.0.2"
     const val supportUrl = "https://ainaa.mafazaa.com/support_us"
     const val joinUrl = "https://www.mafazaa.com/join"
-    const val contactSupportUrl="https://ainaa.mafazaa.com/support"
-    const val safeSearchUrl ="https://google.com/safesearch"
+    const val contactSupportUrl = "https://ainaa.mafazaa.com/support"
+    const val safeSearchUrl = "https://google.com/safesearch"
+
+    /**
+     * See [com.mafazaa.ainaa.data.remote.KtorRepo.getLatestVersion]
+     */
     const val releaseApkName = "ainaa"
-    const val maxNodes = 1000//todo
+    const val maxNodes = 1000//todo if screen analysis exceeds this value stop analyzing
+
+    /**
+     * Default script codes to detect disabling attempts
+     */
     val defaultCodes: List<ScriptCode> = listOf(
         ScriptCode(
             "uninstall screen xiaomi", """          
@@ -33,7 +41,7 @@ object Constants {
     }
 })();
         """.trimIndent()
-        ),ScriptCode(
+        ), ScriptCode(
             "app info screen xiaomi", """          
 (function() {     
             try {
@@ -51,7 +59,7 @@ for (h in ls) {
   }
 })();
         """.trimIndent()
-        ),ScriptCode(
+        ), ScriptCode(
             "battery pop up xiaomi", """          
 (function() {     
             try {

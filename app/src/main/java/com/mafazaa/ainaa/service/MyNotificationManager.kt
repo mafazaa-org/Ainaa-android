@@ -52,6 +52,7 @@ object MyNotificationManager {
             .build()
         service.startForeground(SERVICE_ID, notification)
     }
+
     fun showUpdateNotification(context: Context) {
         if (!notificationChannelCreated) {
             createNotificationChannels(context)

@@ -1,7 +1,7 @@
-package com.mafazaa.ainaa.data.local
+package com.mafazaa.ainaa.data.util
 
 import android.content.SharedPreferences
-import com.mafazaa.ainaa.model.ProtectionLevel
+import com.mafazaa.ainaa.model.DnsProtectionLevel
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -25,10 +25,11 @@ class SharedPreferenceDelegates(private val prefs: SharedPreferences) {
         create(default, key, prefs::getLong, prefs.edit()::putLong)
 
     fun protectionLevel(
-        default: ProtectionLevel = ProtectionLevel.LOW,
+        default: DnsProtectionLevel = DnsProtectionLevel.LOW,
         key: String? = null,
-    ): ReadWriteProperty<Any, ProtectionLevel> =
-        create(default, key, { k, d -> ProtectionLevel.entries[prefs.getInt(k, d.ordinal)] },
+    ): ReadWriteProperty<Any, DnsProtectionLevel> =
+        create(
+            default, key, { k, d -> DnsProtectionLevel.entries[prefs.getInt(k, d.ordinal)] },
             { k, v -> prefs.edit().putInt(k, v.ordinal) })
 
     fun string(default: String = "", key: String? = null): ReadWriteProperty<Any, String> =
@@ -63,7 +64,7 @@ class SharedPreferenceDelegates(private val prefs: SharedPreferences) {
         key: String? = null,
         getter: (key: String, default: T) -> T,
         setter: (key: String, value: T) -> SharedPreferences.Editor,
-    ) = object: ReadWriteProperty<Any, T> {
+    ) = object : ReadWriteProperty<Any, T> {
         private fun key(property: KProperty<*>) = key ?: property.name
 
         override fun getValue(thisRef: Any, property: KProperty<*>): T =

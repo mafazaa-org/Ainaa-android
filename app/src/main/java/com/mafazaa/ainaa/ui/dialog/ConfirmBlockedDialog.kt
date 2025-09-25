@@ -1,22 +1,37 @@
 package com.mafazaa.ainaa.ui.dialog
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.font.*
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.mafazaa.ainaa.R
-import com.mafazaa.ainaa.model.*
-import com.mafazaa.ainaa.ui.theme.*
+import com.mafazaa.ainaa.ui.AppInfo
+import com.mafazaa.ainaa.ui.theme.red
 
-
+/**
+ * A dialog to confirm blocking an app.
+ */
 @Composable
-fun ConfirmDeleteDialog(
+fun ConfirmBlockedDialog(
     app: AppInfo,
     onDismiss: () -> Unit,
     onConfirm: (AppInfo) -> Unit,
@@ -41,7 +56,7 @@ fun ConfirmDeleteDialog(
                         painter = painterResource(id = R.drawable.baseline_close_24),
                         contentDescription = "close",
 
-                    )
+                        )
                 }
 
                 // Title

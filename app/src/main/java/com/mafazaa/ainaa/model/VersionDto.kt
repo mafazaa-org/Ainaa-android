@@ -1,6 +1,6 @@
 package com.mafazaa.ainaa.model
 
-data class Version(
+data class VersionDto(
     val version: Int,
     val name: String,
     val downloadUrl: String,

@@ -1,7 +1,10 @@
-package com.mafazaa.ainaa.model
+package com.mafazaa.ainaa.ui
 
-import android.graphics.drawable.*
+import android.graphics.drawable.Drawable
 
+/**
+ * Data class for BlockAppDialog.
+ */
 data class AppInfo(
     val name: String,
     val icon: Drawable?,

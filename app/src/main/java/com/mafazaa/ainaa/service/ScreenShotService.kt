@@ -12,16 +12,10 @@ import android.view.View
 import android.view.WindowManager
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.setViewTreeLifecycleOwner
-import androidx.savedstate.SavedStateRegistry
-import androidx.savedstate.SavedStateRegistryController
-import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
 import com.mafazaa.ainaa.ui.service.ScreenshotOverlay
@@ -32,20 +26,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class ScreenShotService : Service(), LifecycleOwner, SavedStateRegistryOwner {
+class ScreenShotService : Service() {
+    //todo make it like
     private lateinit var windowManager: WindowManager
     private val serviceScope = CoroutineScope(Dispatchers.Default + Job())
     private var overlayView: View? = null
-    private var initialX = 0
-    private var initialY = 0
-    private var initialTouchX = 0f
-    private var initialTouchY = 0f
 
     // Lifecycle + saved state to satisfy Compose outside Activity/Fragment
-    private val lifecycleRegistry = LifecycleRegistry(this)
-    private val savedStateController = SavedStateRegistryController.create(this)
-    override val lifecycle: Lifecycle get() = lifecycleRegistry
-    override val savedStateRegistry: SavedStateRegistry get() = savedStateController.savedStateRegistry
+    private val myLifecycleOwner = MyLifecycleOwner()
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -54,9 +42,7 @@ class ScreenShotService : Service(), LifecycleOwner, SavedStateRegistryOwner {
         super.onCreate()
         Log.d(TAG, "onCreate")
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        savedStateController.performAttach()
-        savedStateController.performRestore(null)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+        myLifecycleOwner.onStart()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -68,18 +54,16 @@ class ScreenShotService : Service(), LifecycleOwner, SavedStateRegistryOwner {
     private fun showOverlay() {
         Log.d(TAG, "showOverlay")
         if (overlayView != null) return
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+        myLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        myLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
         overlayView = ComposeView(this).apply {
-            setViewTreeLifecycleOwner(this@ScreenShotService)
-            setViewTreeSavedStateRegistryOwner(this@ScreenShotService)
+            setViewTreeLifecycleOwner(myLifecycleOwner)
+            setViewTreeSavedStateRegistryOwner(myLifecycleOwner)
             setContent {
                 AinaaTheme {
                     ScreenshotOverlay(
                         modifier = Modifier.pointerInput(Unit) {
-                            var lastPosition = Offset.Zero
                             detectDragGestures(
-                                onDragStart = { offset -> lastPosition = offset },
                                 onDrag = { change, dragAmount ->
                                     val layoutParams =
                                         overlayView!!.layoutParams as WindowManager.LayoutParams
@@ -91,7 +75,7 @@ class ScreenShotService : Service(), LifecycleOwner, SavedStateRegistryOwner {
                             )
                         },
                         onClose = { closeOverlay() },
-                        onScreenShot = {d->
+                        onScreenShot = { d ->
                             serviceScope.launch {
                                 delay(d)
                                 startAccessibilityService(MyAccessibilityService.ACTION_SHARE_CURRENT_SCREEN)
@@ -110,8 +94,8 @@ class ScreenShotService : Service(), LifecycleOwner, SavedStateRegistryOwner {
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.START
-            x = -100
-            y = 800
+            x = initialX
+            y = initialY
         }
         windowManager.addView(overlayView, params)
 
@@ -120,16 +104,18 @@ class ScreenShotService : Service(), LifecycleOwner, SavedStateRegistryOwner {
     private fun closeOverlay() {
         overlayView?.let { windowManager.removeView(it) }
         overlayView = null
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        myLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        myLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
     }
 
+
     companion object {
+        private const val initialX = -100
+        private const val initialY = 800
+
         const val TAG = "ComposeOverlayService"
-        var isOverlayShown = false//todo
         fun start(context: Context) {
             context.startService(Intent(context, ScreenShotService::class.java))
-            isOverlayShown = true
         }
     }
 }

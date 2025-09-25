@@ -4,7 +4,7 @@ import android.content.Context
 import com.mafazaa.ainaa.model.FileRepo
 import java.io.File
 
-class RealFileRepo(val context: Context): FileRepo {
+class RealFileRepo(val context: Context) : FileRepo {
 
     override fun getLogFile(fileName: String): File = File(context.cacheDir, fileName)
     override fun getLogSize(fileName: String): Long {
@@ -24,6 +24,7 @@ class RealFileRepo(val context: Context): FileRepo {
         val logFile = getLogFile(fileName)
         logFile.appendText(content)
     }
+
     override fun getUpdateFile(): File = File(
         context.filesDir,
         "update.apk"

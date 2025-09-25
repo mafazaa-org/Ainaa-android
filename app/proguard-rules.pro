@@ -12,9 +12,11 @@
 #   public *;
 #}
 -keep class com.mafazaa.ainaa.model.** { *; }
+-keep class com.mafazaa.ainaa.data.JsEngine
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
 #-keepattributes SourceFile,LineNumberTable
+-dontobfuscate
 -dontwarn java.beans.BeanDescriptor
 -dontwarn java.beans.BeanInfo
 -dontwarn java.beans.IntrospectionException

@@ -13,7 +13,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun TowColorText(modifier: Modifier= Modifier, black: String, red: String, onClick: () -> Unit) {
+fun TwoColorText(modifier: Modifier = Modifier, black: String, red: String, onClick: () -> Unit) {
     Text(
         buildAnnotatedString {
             append("$black ")

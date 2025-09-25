@@ -22,37 +22,38 @@ class UpdateManager(
 
         val updateFile = fileProvider.getUpdateFile()
 
-        val version = try {
+        val remoteVersion = try {
             repo.getLatestVersion()
         } catch (_: Exception) {
             emit(UpdateState.NoUpdate)
             return@flow
         }
 
-        if (version == null) {
+        if (remoteVersion == null) {
             emit(
-                if (localData.downloadedVersion > currentVersion) UpdateState.Downloaded
-                else UpdateState.NoUpdate
+                if (localData.downloadedVersion > currentVersion) {
+                    UpdateState.Downloaded
+                } else {
+                    UpdateState.NoUpdate
+                }
             )
             return@flow
         }
 
-        if (localData.downloadedVersion >= version.version) {
+        if (localData.downloadedVersion >= remoteVersion.version) {
             emit(UpdateState.Downloaded)
             return@flow
         }
 
-        if (version.version <= currentVersion) {
+        if (remoteVersion.version <= currentVersion) {
             emit(UpdateState.NoUpdate)
             return@flow
         }
 
-        // need to download
-
-        Lg.d(TAG, "Downloading update version ${version.version}")
+        Lg.d(TAG, "Downloading update version ${remoteVersion.version}")
         emit(UpdateState.Downloading)
-        if (repo.downloadFile(version.downloadUrl, updateFile)) {
-            localData.downloadedVersion = version.version
+        if (repo.downloadFile(remoteVersion.downloadUrl, updateFile)) {
+            localData.downloadedVersion = remoteVersion.version
             emit(UpdateState.Downloaded)
         } else {
             Lg.e(TAG, "Download failed")

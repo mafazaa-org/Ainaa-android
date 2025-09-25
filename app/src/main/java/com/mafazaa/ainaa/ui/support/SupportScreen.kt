@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mafazaa.ainaa.BuildConfig
-import com.mafazaa.ainaa.ui.comp.TowColorText
+import com.mafazaa.ainaa.ui.comp.TwoColorText
 import com.mafazaa.ainaa.ui.theme.red
 
 @Composable
@@ -34,7 +34,8 @@ fun SupportScreen(
     onSupportClick: () -> Unit = {},
     onJoinClick: () -> Unit = {},
     onShareLogFile: () -> Unit = {},
-    onStopBlocking: () -> Unit = {}
+    onStopBlocking: () -> Unit = {},
+    onOpenScreenShotWindow: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -116,18 +117,23 @@ fun SupportScreen(
                 }
             }
         }
-        TowColorText(black = "مشاركة ملف السجل", red = "اضغط هنا") {
+        TwoColorText(black = "مشاركة ملف السجل", red = "اضغط هنا") {
             onShareLogFile()
+        }
+        TwoColorText(black = "لمشاركة شاشة غير محجوبة", red = "اضغط هنا") {
+            onOpenScreenShotWindow()
+
         }
         if (BuildConfig.DEBUG) {
             Spacer(modifier = Modifier.height(16.dp))
-            TowColorText(black = "إيقاف الحجب مؤقتاً", red = "اضغط هنا") {
+            TwoColorText(black = "إيقاف الحجب مؤقتاً", red = "اضغط هنا") {
                 onStopBlocking()
             }
         }
 
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun SupportScreenPreview() {

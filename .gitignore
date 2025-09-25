@@ -18,3 +18,4 @@ local.properties
 *.pem
 *apk*
 *aab*
+/app/google-services.json

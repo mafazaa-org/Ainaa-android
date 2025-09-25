@@ -51,7 +51,7 @@
         </service>
 
         <activity
-            android:name="com.mafazaa.ainaa.MainActivity"
+            android:name="com.mafazaa.ainaa.AppActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

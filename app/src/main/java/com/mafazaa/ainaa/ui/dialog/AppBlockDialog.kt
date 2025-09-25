@@ -1,28 +1,50 @@
 package com.mafazaa.ainaa.ui.dialog
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.*
-import androidx.compose.material.icons.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.font.*
-import androidx.compose.ui.text.style.*
-import androidx.compose.ui.tooling.preview.*
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.window.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.mafazaa.ainaa.R
-import com.mafazaa.ainaa.model.*
 import com.mafazaa.ainaa.toPainter
-import com.mafazaa.ainaa.ui.theme.*
+import com.mafazaa.ainaa.ui.AppInfo
+import com.mafazaa.ainaa.ui.theme.red
 
-
+/*
+ * A dialog that shows a list of apps to block
+ * and allows the user to block an app
+ */
 @Composable
 fun BlockAppDialog(
     onDismiss: () -> Unit,
@@ -79,7 +101,7 @@ fun BlockAppDialog(
                         .padding(8.dp)
                 ) {
                     LazyColumn {
-                        items(appStates){app->
+                        items(appStates) { app ->
                             AppBlockItem(app) { onBlockClick(app) }
                             Spacer(modifier = Modifier.height(8.dp))
                             HorizontalDivider(
@@ -97,6 +119,7 @@ fun BlockAppDialog(
     }
 
 }
+
 @Composable
 fun AppBlockItem(
     app: AppInfo,
