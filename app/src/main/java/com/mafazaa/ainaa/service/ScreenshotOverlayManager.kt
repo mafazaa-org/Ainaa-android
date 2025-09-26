@@ -1,11 +1,7 @@
 package com.mafazaa.ainaa.service
 
-import android.annotation.SuppressLint
-import android.app.Service
 import android.content.Context
-import android.content.Intent
 import android.graphics.PixelFormat
-import android.os.IBinder
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -25,38 +21,29 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
 
-class ScreenShotService : Service() {
-    //todo make it like
-    private lateinit var windowManager: WindowManager
-    private val serviceScope = CoroutineScope(Dispatchers.Default + Job())
+/**
+ * ScreenshotOverlayManager manages the floating screenshot overlay using Jetpack Compose.
+ * It provides methods to show and close the overlay, and handles drag, close, and screenshot actions.
+ * This class is not a Service and should be managed by the caller.
+ */
+class ScreenshotOverlayManager(val context: Context) {
     private var overlayView: View? = null
-
-    // Lifecycle + saved state to satisfy Compose outside Activity/Fragment
+    private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    private val serviceScope = CoroutineScope(Dispatchers.Default + Job())
     private val myLifecycleOwner = MyLifecycleOwner()
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
 
-    override fun onCreate() {
-        super.onCreate()
-        Log.d(TAG, "onCreate")
-        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        myLifecycleOwner.onStart()
-    }
-
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        showOverlay()
-        return START_NOT_STICKY
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun showOverlay() {
+    /**
+     * Shows the screenshot overlay if not already visible.
+     */
+    fun showOverlay() {
         Log.d(TAG, "showOverlay")
         if (overlayView != null) return
+        myLifecycleOwner.onStart()
         myLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_START)
         myLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        overlayView = ComposeView(this).apply {
+        overlayView = ComposeView(context).apply {
             setViewTreeLifecycleOwner(myLifecycleOwner)
             setViewTreeSavedStateRegistryOwner(myLifecycleOwner)
             setContent {
@@ -78,14 +65,12 @@ class ScreenShotService : Service() {
                         onScreenShot = { d ->
                             serviceScope.launch {
                                 delay(d)
-                                startAccessibilityService(MyAccessibilityService.ACTION_SHARE_CURRENT_SCREEN)
+                                context.startAccessibilityService(MyAccessibilityService.ACTION_SHARE_CURRENT_SCREEN)
                             }
                         })
                 }
             }
         }
-
-
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -98,25 +83,24 @@ class ScreenShotService : Service() {
             y = initialY
         }
         windowManager.addView(overlayView, params)
-
+        isShowing.value = true
     }
 
-    private fun closeOverlay() {
+    /**
+     * Closes the screenshot overlay if visible.
+     */
+    fun closeOverlay() {
         overlayView?.let { windowManager.removeView(it) }
         overlayView = null
         myLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
         myLifecycleOwner.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        isShowing.value = false
     }
-
 
     companion object {
         private const val initialX = -100
         private const val initialY = 800
-
-        const val TAG = "ComposeOverlayService"
-        fun start(context: Context) {
-            context.startService(Intent(context, ScreenShotService::class.java))
-        }
+        const val TAG = "ScreenshotOverlayManager"
+        var isShowing = MutableStateFlow(false)
     }
 }
-

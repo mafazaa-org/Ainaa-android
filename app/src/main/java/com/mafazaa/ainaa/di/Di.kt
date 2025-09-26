@@ -15,6 +15,7 @@ import com.mafazaa.ainaa.model.repo.RemoteRepo
 import com.mafazaa.ainaa.model.repo.ScriptRepo
 import com.mafazaa.ainaa.model.repo.UpdateRepo
 import com.mafazaa.ainaa.service.LockOverlayManager
+import com.mafazaa.ainaa.service.ScreenshotOverlayManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -25,6 +26,7 @@ val appModule = module {
     single<LocalData> { LocalData(androidContext().getSharedPreferences("App", MODE_PRIVATE)) }
     single<FileRepo> { RealFileRepo(androidContext()) }
     single<LockOverlayManager> { LockOverlayManager(androidContext()) }
+    single<ScreenshotOverlayManager> { ScreenshotOverlayManager(androidContext()) }
     single<ScriptRepo> {
         JsEngine().apply {
             setCodes(
@@ -34,6 +36,6 @@ val appModule = module {
     }
     single<UpdateRepo> { UpdateManager(get(), get(), get()) }
 
-    viewModel { AppViewModel(get(), get(), get(), get()) }
+    viewModel { AppViewModel(get(), get(), get(), get(), get()) }
 
 }

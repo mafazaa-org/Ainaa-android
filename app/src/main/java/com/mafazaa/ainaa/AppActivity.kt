@@ -38,7 +38,8 @@ import com.mafazaa.ainaa.model.UpdateState
 import com.mafazaa.ainaa.service.MyAccessibilityService
 import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
 import com.mafazaa.ainaa.service.MyVpnService
-import com.mafazaa.ainaa.service.ScreenShotService
+
+import com.mafazaa.ainaa.service.ScreenshotOverlayManager
 import com.mafazaa.ainaa.ui.AppInfo
 import com.mafazaa.ainaa.ui.BottomBar
 import com.mafazaa.ainaa.ui.Screen
@@ -69,6 +70,7 @@ sealed interface DialogState {
     data class EnableProtectionConfirm(val level: DnsProtectionLevel, val phone: String) :
         DialogState
 }
+
 
 class AppActivity : ComponentActivity() {
     private var vpnPermission by mutableStateOf(false)
@@ -313,7 +315,7 @@ class AppActivity : ComponentActivity() {
                                 onShareLogFile = { this@AppActivity.shareFile(viewModel.getLogFile()) },
                                 onStopBlocking = { startAccessibilityService(MyAccessibilityService.ACTION_STOP) },
                                 onOpenScreenShotWindow = {
-                                    ScreenShotService.start(context)
+                                    viewModel.showScreenshotOverlay(true)
 
                                 }
                             )

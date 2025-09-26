@@ -14,6 +14,7 @@ import com.mafazaa.ainaa.model.ReportDto
 import com.mafazaa.ainaa.model.UpdateState
 import com.mafazaa.ainaa.model.repo.RemoteRepo
 import com.mafazaa.ainaa.model.repo.UpdateRepo
+import com.mafazaa.ainaa.service.ScreenshotOverlayManager
 import com.mafazaa.ainaa.ui.AppInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +26,8 @@ class AppViewModel(
     private val remoteRepo: RemoteRepo,
     private val localData: LocalData,
     private val fileRepo: FileRepo,
-    private val updateRepo: UpdateRepo
+    private val updateRepo: UpdateRepo,
+    private val screenshotOverlayManager: ScreenshotOverlayManager
 ) : ViewModel() {
 
     private val TAG = "MainViewModel"
@@ -43,6 +45,13 @@ class AppViewModel(
             }
         }
         _apps.value = appList
+    }
+    fun showScreenshotOverlay(show: Boolean) {
+        if (show) {
+            screenshotOverlayManager.showOverlay()
+        } else {
+            screenshotOverlayManager.closeOverlay()
+        }
     }
 
     fun handleUpdateStatus() {
