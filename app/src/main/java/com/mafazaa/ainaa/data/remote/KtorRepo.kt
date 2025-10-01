@@ -34,7 +34,7 @@ import java.io.File
 class KtorRepo : RemoteRepo {
 
     val reportProblemFormUrl =
-        "https://docs.google.com/forms/d/e/1FAIpQLSfnspR0eAjWtYKbweOQSAOrq2OWR8dkvyEy_uj0XokrNiHnPw/formResponse"
+        "https://docs.google.com/forms/d/e/1FAIpQLSdGddOCCrlfbCjmBhTyu38EczpW_CeBGWOqGwvaQmXv1kDNRA/formResponse"
     val reportNameEntryId = "entry.654511892"
     val reportPhoneNumberEntryId = "entry.1692603949"
     val reportEmailEntryId = "entry.742958279"
