@@ -44,7 +44,7 @@ import com.mafazaa.ainaa.ui.theme.red
 fun EnableProtectionScreen(
     modifier: Modifier = Modifier,
     report: () -> Unit,
-    enableProtection: (DnsProtectionLevel, String) -> Unit,
+    enableProtection: (DnsProtectionLevel) -> Unit,
     selectedLevel: DnsProtectionLevel,
 ) {
     Column(
@@ -58,54 +58,21 @@ fun EnableProtectionScreen(
         ProtectionLevelSelector(selectedLevel, {
             selectedLevel = it
         })
-        ProtectYourDevice({ enableProtection(selectedLevel, it) }, report)
+        ProtectYourDevice({ enableProtection(selectedLevel) }, report)
     }
 
 }
 
 @Composable
-fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
+fun ProtectYourDevice(enableProtection: () -> Unit, report: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Title and Subtitle Section
-        Column(
-            modifier = Modifier.padding(top = 4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "قم بحماية جهازك الآن",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-        var phoneNumber by remember { mutableStateOf("") }
-        val isPhoneNumberValid by remember {
-            derivedStateOf {
-                phoneNumber.isNotEmpty() && phoneNumber.all { it.isDigit() }//todo
-            }
-        }
-        // Phone Number Input Field
-        OutlinedTextField(
-            value = phoneNumber,
-            onValueChange = { phoneNumber = it },
-            label = { Text("رقم الهاتف") },
-            placeholder = { Text("برجاء إدخال رقم الهاتف") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .wrapContentHeight(),
-            isError = !isPhoneNumberValid,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-        Spacer(Modifier.size(16.dp))
 
-        // Enable Protection Button
         Button(
-            onClick = { enableProtection(phoneNumber) },
+            onClick = { enableProtection() },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
@@ -114,7 +81,6 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
                 disabledContainerColor = Color.LightGray,
                 containerColor = red
             ),
-            enabled = isPhoneNumberValid
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -145,5 +111,5 @@ fun ProtectYourDevice(enableProtection: (String) -> Unit, report: () -> Unit) {
 @Preview(showBackground = true, locale = "ar")
 @Composable
 fun PreviewEnableProtectionScreen() {
-    EnableProtectionScreen(Modifier, {}, { _, _ -> }, DnsProtectionLevel.HIGH)
+    EnableProtectionScreen(Modifier, {}, { _-> }, DnsProtectionLevel.HIGH)
 }

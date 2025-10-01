@@ -9,7 +9,6 @@ class LocalData(sharedPreferences: SharedPreferences) {
      * Set of blocked app package names.
      */
     var blockedApps by sharedPreferences.delegates.stringSet()
-    var phoneNum by sharedPreferences.delegates.string()
 
     var dnsProtectionLevel by sharedPreferences.delegates.protectionLevel()
 

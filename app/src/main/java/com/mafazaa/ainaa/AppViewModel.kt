@@ -74,14 +74,7 @@ class AppViewModel(
         }
     }
 
-    fun submitPhoneNumber(phoneNumber: String, result: (NetworkResult) -> Unit) {
-        viewModelScope.launch {
-            remoteRepo.submitPhoneNumberToGoogleForm(phoneNumber)
-                .collect { result ->
-                    result(result)
-                }
-        }
-    }
+
 
     fun submitReport(reportDto: ReportDto, result: (NetworkResult) -> Unit) {
         viewModelScope.launch {
@@ -105,9 +98,7 @@ class AppViewModel(
         localData.dnsProtectionLevel = level
     }
 
-    fun savePhoneNumber(phoneNumber: String) {
-        localData.phoneNum = phoneNumber
-    }
+
 
 
 }

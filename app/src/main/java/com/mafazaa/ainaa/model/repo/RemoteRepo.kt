@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 interface RemoteRepo {
-    fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<NetworkResult>
     fun submitReportToGoogleForm(reportDto: ReportDto): Flow<NetworkResult>
     suspend fun getLatestVersion(): VersionDto?
     suspend fun downloadFile(

@@ -38,8 +38,6 @@ import com.mafazaa.ainaa.model.UpdateState
 import com.mafazaa.ainaa.service.MyAccessibilityService
 import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
 import com.mafazaa.ainaa.service.MyVpnService
-
-import com.mafazaa.ainaa.service.ScreenshotOverlayManager
 import com.mafazaa.ainaa.ui.AppInfo
 import com.mafazaa.ainaa.ui.BottomBar
 import com.mafazaa.ainaa.ui.Screen
@@ -67,7 +65,7 @@ sealed interface DialogState {
     // Keeps Block Apps dialog open, and optionally shows a nested confirm dialog for a selected app
     data class BlockApps(val confirmApp: AppInfo? = null) : DialogState
     data object HowItWorks : DialogState
-    data class EnableProtectionConfirm(val level: DnsProtectionLevel, val phone: String) :
+    data class EnableProtectionConfirm(val level: DnsProtectionLevel) :
         DialogState
 }
 
@@ -210,34 +208,19 @@ class AppActivity : ComponentActivity() {
                 EnableProtectionDialog(
                     onConfirm = {
                         // Submit phone & activate
-                        viewModel.submitPhoneNumber(d.phone) {
-                            when (it) {
-                                NetworkResult.Success -> {
-                                    Toast.makeText(
-                                        context,
-                                        "تم تفعيل الحماية بنجاح",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                    viewModel.savePhoneNumber(d.phone)
-                                    viewModel.saveLevel(d.level)
-                                    startAccessibilityService()
-                                    context.startVpnService()
-                                    backStack.add(Screen.ProtectionActivated)
-                                    backStack.remove(Screen.EnableProtection)
-                                }
 
-                                is NetworkResult.Error -> {
-                                    Toast.makeText(
-                                        context,
-                                        "فشل في أرسال البيانات : ${'$'}{it.message}",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-
-                                else -> {}
-                            }
-                        }
+                        Toast.makeText(
+                            context,
+                            "تم تفعيل الحماية بنجاح",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        viewModel.saveLevel(d.level)
+                        startAccessibilityService()
+                        context.startVpnService()
+                        backStack.add(Screen.ProtectionActivated)
+                        backStack.remove(Screen.EnableProtection)
                         dialogState = null
+
                     },
                     onDismiss = { dialogState = null }
                 )
@@ -323,13 +306,11 @@ class AppActivity : ComponentActivity() {
 
                         Screen.EnableProtection -> NavEntry(key) {
                             var selectedLevel by remember { mutableStateOf(DnsProtectionLevel.LOW) }
-                            var phoneNumber by remember { mutableStateOf("") }
 
                             EnableProtectionScreen(
                                 report = { dialogState = DialogState.ReportProblem },
-                                enableProtection = { level: DnsProtectionLevel, phone: String ->
+                                enableProtection = { level: DnsProtectionLevel ->
                                     selectedLevel = level
-                                    phoneNumber = phone
                                     when {
                                         !vpnPermission -> dialogState =
                                             DialogState.Permission(PermissionState.Vpn)
@@ -345,7 +326,6 @@ class AppActivity : ComponentActivity() {
 
                                         else -> dialogState = DialogState.EnableProtectionConfirm(
                                             level = selectedLevel,
-                                            phone = phoneNumber
                                         )
                                     }
                                 },

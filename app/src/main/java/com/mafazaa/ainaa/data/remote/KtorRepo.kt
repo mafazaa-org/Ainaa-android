@@ -33,10 +33,6 @@ import java.io.File
 
 class KtorRepo : RemoteRepo {
 
-    val phoneNumberFormUrl =
-        "https://docs.google.com/forms/d/1SisfmhFyuSPjafRb3UKf66QBgjO83Bcxc7DfIkddRiM/formResponse "
-    val phoneNumberEntryId = "entry.1388739102" // Your Entry ID
-
     val reportProblemFormUrl =
         "https://docs.google.com/forms/d/e/1FAIpQLSfnspR0eAjWtYKbweOQSAOrq2OWR8dkvyEy_uj0XokrNiHnPw/formResponse"
     val reportNameEntryId = "entry.654511892"
@@ -107,24 +103,6 @@ class KtorRepo : RemoteRepo {
         }
     }
 
-
-    override fun submitPhoneNumberToGoogleForm(phoneNumber: String): Flow<NetworkResult> = flow {
-        emit(NetworkResult.Loading)
-        try {
-            val response: HttpResponse = client.post(phoneNumberFormUrl) {
-                contentType(ContentType.Application.FormUrlEncoded)
-                setBody("$phoneNumberEntryId=$phoneNumber")
-            }
-
-            if (!response.status.isSuccess()) {
-                emit(NetworkResult.Error("Failed: ${response.status}"))
-            } else {
-                emit(NetworkResult.Success)
-            }
-        } catch (e: Exception) {
-            emit(NetworkResult.Error(e.localizedMessage))
-        }
-    }
 
     override fun submitReportToGoogleForm(reportDto: ReportDto): Flow<NetworkResult> = flow {
         emit(NetworkResult.Loading)
