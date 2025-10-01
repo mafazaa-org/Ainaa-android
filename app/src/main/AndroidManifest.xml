@@ -96,9 +96,7 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
-        <service
-            android:name=".service.ScreenShotService"
-            android:exported="false" />
+
 
     </application>
 
