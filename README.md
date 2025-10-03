@@ -1,4 +1,5 @@
 # Ainaa Android
+<img width="846" height="309" alt="شعار عينا احمر" src="https://github.com/user-attachments/assets/5f504e5c-a6f6-4262-b4f6-d54f36a69d88" />
 
 Ainaa is an Android application built with Kotlin, following MVVM architecture and using dependency injection. It provides advanced features such as VPN, accessibility services, overlays, and integrates with Firebase via Google Services.
 
