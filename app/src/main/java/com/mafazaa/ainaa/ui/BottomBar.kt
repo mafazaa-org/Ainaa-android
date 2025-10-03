@@ -28,7 +28,7 @@ fun BottomBar(
     home: () -> Unit,
 ) {
     Box(
-        modifier.fillMaxWidth(),
+        modifier.fillMaxWidth()
     ) {
         Text(
             text = "Android:$androidVersion",
