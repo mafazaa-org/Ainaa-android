@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.mafazaa.ainaa.R
-import com.mafazaa.ainaa.ui.AppInfo
+import com.mafazaa.ainaa.domain.models.AppInfo
 import com.mafazaa.ainaa.ui.theme.red
 
 /**

@@ -3,13 +3,13 @@ package com.mafazaa.ainaa.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.mafazaa.ainaa.Lg
-import com.mafazaa.ainaa.data.FakeFileRepo
-import com.mafazaa.ainaa.hasAccessibilityPermission
-import com.mafazaa.ainaa.hasVpnPermission
-import com.mafazaa.ainaa.isKeyguardSecure
+import com.mafazaa.ainaa.utils.MyLog
+import com.mafazaa.ainaa.data.local.FakeFileRepo
+import com.mafazaa.ainaa.utils.hasAccessibilityPermission
+import com.mafazaa.ainaa.utils.hasVpnPermission
+import com.mafazaa.ainaa.utils.isKeyguardSecure
 import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
-import com.mafazaa.ainaa.startVpnService
+import com.mafazaa.ainaa.utils.startVpnService
 
 class BootReceiver : BroadcastReceiver() {
 
@@ -22,15 +22,15 @@ class BootReceiver : BroadcastReceiver() {
         }
 
         if (!context.isKeyguardSecure()) {
-            Lg.fileRepo = FakeFileRepo
-            Lg.w(TAG, "Device is not encrypted, logging disabled")
+            MyLog.fileRepo = FakeFileRepo
+            MyLog.w(TAG, "Device is not encrypted, logging disabled")
         }
-        Lg.i(TAG, "Device :${intent.action}")
+        MyLog.i(TAG, "Device :${intent.action}")
         if (context.hasAccessibilityPermission()) {
             context.startAccessibilityService()
         }
         if (context.hasVpnPermission()) {
-            Lg.i(TAG, "Starting vpn on boot")
+            MyLog.i(TAG, "Starting vpn on boot")
             context.startVpnService()
         }
 

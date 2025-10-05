@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.mafazaa.ainaa.BuildConfig
-import com.mafazaa.ainaa.Lg
-import com.mafazaa.ainaa.data.local.LocalData
-import com.mafazaa.ainaa.model.repo.UpdateRepo
-import com.mafazaa.ainaa.service.MyNotificationManager.showUpdateNotification
+import com.mafazaa.ainaa.utils.MyLog
+import com.mafazaa.ainaa.data.local.SharedPrefs
+import com.mafazaa.ainaa.domain.repo.UpdateRepo
+import com.mafazaa.ainaa.helpers.MyNotificationManager.showUpdateNotification
 import org.koin.java.KoinJavaComponent.inject
 
 class DailyUpdateNotificationWorker(
@@ -15,14 +15,14 @@ class DailyUpdateNotificationWorker(
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     val updateManager: UpdateRepo by inject(UpdateRepo::class.java)
-    val localData: LocalData by inject(LocalData::class.java)
+    val sharedPrefs: SharedPrefs by inject(SharedPrefs::class.java)
 
 
     override suspend fun doWork(): Result {
-        Lg.d(TAG, "DailyNotificationWorker")
+        MyLog.d(TAG, "DailyNotificationWorker")
         updateManager.checkAndDownloadIfNeeded(BuildConfig.VERSION_CODE).collect {
         }
-        if (localData.downloadedVersion >= BuildConfig.VERSION_CODE) {
+        if (sharedPrefs.downloadedVersion >= BuildConfig.VERSION_CODE) {
             showUpdateNotification(
                 context
             )

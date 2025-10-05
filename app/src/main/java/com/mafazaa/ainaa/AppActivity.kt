@@ -9,9 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
@@ -32,32 +30,49 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
-import com.mafazaa.ainaa.Constants.contactSupportUrl
-import com.mafazaa.ainaa.Constants.joinUrl
-import com.mafazaa.ainaa.Constants.safeSearchUrl
-import com.mafazaa.ainaa.Constants.supportUrl
-import com.mafazaa.ainaa.data.local.LocalData
-import com.mafazaa.ainaa.data.remote.NetworkResult
-import com.mafazaa.ainaa.model.DnsProtectionLevel
-import com.mafazaa.ainaa.model.UpdateState
+import com.mafazaa.ainaa.utils.Constants.contactSupportUrl
+import com.mafazaa.ainaa.utils.Constants.joinUrl
+import com.mafazaa.ainaa.utils.Constants.safeSearchUrl
+import com.mafazaa.ainaa.utils.Constants.supportUrl
+import com.mafazaa.ainaa.data.local.SharedPrefs
+import com.mafazaa.ainaa.data.models.NetworkResult
+import com.mafazaa.ainaa.domain.models.DnsProtectionLevel
+import com.mafazaa.ainaa.domain.models.UpdateState
 import com.mafazaa.ainaa.service.MyAccessibilityService
 import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
 import com.mafazaa.ainaa.service.MyVpnService
-import com.mafazaa.ainaa.ui.AppInfo
-import com.mafazaa.ainaa.ui.BottomBar
-import com.mafazaa.ainaa.ui.Screen
-import com.mafazaa.ainaa.ui.TopBar
-import com.mafazaa.ainaa.ui.comp.OkDialog
+import com.mafazaa.ainaa.domain.models.AppInfo
+import com.mafazaa.ainaa.ui.common.BottomBar
+import com.mafazaa.ainaa.navigation.Screen
+import com.mafazaa.ainaa.ui.common.TopBar
+import com.mafazaa.ainaa.ui.common.OkDialog
 import com.mafazaa.ainaa.ui.dialog.BlockAppDialog
 import com.mafazaa.ainaa.ui.dialog.ConfirmBlockedDialog
 import com.mafazaa.ainaa.ui.dialog.EnableProtectionDialog
 import com.mafazaa.ainaa.ui.dialog.HowItWorksDialog
 import com.mafazaa.ainaa.ui.dialog.PermissionDialog
 import com.mafazaa.ainaa.ui.dialog.ReportProblemDialog
-import com.mafazaa.ainaa.ui.enable_pro.EnableProtectionScreen
-import com.mafazaa.ainaa.ui.pro_activated.ProtectionActivatedScreen
+import com.mafazaa.ainaa.ui.protection.EnableProtectionScreen
+import com.mafazaa.ainaa.ui.protection.ProtectionActivatedScreen
 import com.mafazaa.ainaa.ui.support.SupportScreen
 import com.mafazaa.ainaa.ui.theme.AinaaTheme
+import com.mafazaa.ainaa.utils.MyLog
+import com.mafazaa.ainaa.domain.models.PermissionState
+import com.mafazaa.ainaa.utils.getAllApps
+import com.mafazaa.ainaa.utils.hasAccessibilityPermission
+import com.mafazaa.ainaa.utils.hasNotificationPermission
+import com.mafazaa.ainaa.utils.hasOverlayPermission
+import com.mafazaa.ainaa.utils.hasUsageStatsPermission
+import com.mafazaa.ainaa.utils.hasVpnPermission
+import com.mafazaa.ainaa.utils.installApk
+import com.mafazaa.ainaa.utils.openUrl
+import com.mafazaa.ainaa.utils.requestAccessibilityPermission
+import com.mafazaa.ainaa.utils.requestDrawOverlaysPermission
+import com.mafazaa.ainaa.utils.requestUsageStatsPermission
+import com.mafazaa.ainaa.utils.requestVpnPermission
+import com.mafazaa.ainaa.utils.shareFile
+import com.mafazaa.ainaa.utils.startVpnService
+import com.mafazaa.ainaa.viewmodels.AppViewModel
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.java.KoinJavaComponent.inject
 
@@ -87,16 +102,16 @@ class AppActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val viewModel: AppViewModel = getViewModel()
-        val localData: LocalData by inject(LocalData::class.java)
+        val sharedPrefs: SharedPrefs by inject(SharedPrefs::class.java)
         viewModel.loadInstalledApps(getAllApps())
-        Lg.i(TAG, "Opening app")
+        MyLog.i(TAG, "Opening app")
         //viewModel.handleUpdateStatus(this)
         refreshPermissionState()
         setContent {
             AinaaTheme {
                 MainRoot(
                     viewModel = viewModel,
-                    localData = localData,
+                    sharedPrefs = sharedPrefs,
                 )
             }
         }
@@ -106,7 +121,7 @@ class AppActivity : ComponentActivity() {
     @Composable
     private fun MainRoot(
         viewModel: AppViewModel,
-        localData: LocalData,
+        sharedPrefs: SharedPrefs,
     ) {
         val snackbarHostState = remember { SnackbarHostState() }
         val backStack = remember {

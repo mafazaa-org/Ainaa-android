@@ -3,10 +3,10 @@ package com.mafazaa.ainaa.data
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.mafazaa.ainaa.BuildConfig
-import com.mafazaa.ainaa.model.ScreenAnalysis
-import com.mafazaa.ainaa.model.ScriptCode
-import com.mafazaa.ainaa.model.ScriptResult
-import com.mafazaa.ainaa.model.repo.ScriptRepo
+import com.mafazaa.ainaa.domain.models.ScreenAnalysis
+import com.mafazaa.ainaa.domain.models.ScriptCode
+import com.mafazaa.ainaa.domain.models.ScriptResult
+import com.mafazaa.ainaa.domain.repo.ScriptRepo
 import org.mozilla.javascript.Context
 import org.mozilla.javascript.ContextFactory
 import org.mozilla.javascript.Scriptable

@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mafazaa.ainaa.BuildConfig
-import com.mafazaa.ainaa.ui.comp.TwoColorText
+import com.mafazaa.ainaa.ui.common.TwoColorText
 import com.mafazaa.ainaa.ui.theme.red
 
 @Composable

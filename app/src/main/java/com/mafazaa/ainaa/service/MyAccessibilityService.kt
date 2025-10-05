@@ -7,16 +7,17 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
-import com.mafazaa.ainaa.Lg
-import com.mafazaa.ainaa.Lg.logUiTree
+import com.mafazaa.ainaa.utils.MyLog
+import com.mafazaa.ainaa.utils.MyLog.logUiTree
 import com.mafazaa.ainaa.R
-import com.mafazaa.ainaa.data.local.LocalData
-import com.mafazaa.ainaa.isKeyguardSecure
-import com.mafazaa.ainaa.model.BlockReason
-import com.mafazaa.ainaa.model.ScreenAnalyser
-import com.mafazaa.ainaa.model.ScriptResult
-import com.mafazaa.ainaa.model.repo.ScriptRepo
-import com.mafazaa.ainaa.shareFile
+import com.mafazaa.ainaa.data.local.SharedPrefs
+import com.mafazaa.ainaa.utils.isKeyguardSecure
+import com.mafazaa.ainaa.domain.models.BlockReason
+import com.mafazaa.ainaa.helpers.ScreenAnalyser
+import com.mafazaa.ainaa.domain.models.ScriptResult
+import com.mafazaa.ainaa.domain.repo.ScriptRepo
+import com.mafazaa.ainaa.helpers.LockOverlayManager
+import com.mafazaa.ainaa.utils.shareFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -31,7 +32,7 @@ class MyAccessibilityService : AccessibilityService() {
     private val serviceScope = CoroutineScope(Dispatchers.Default + Job())
     lateinit var lockOverlayManager: LockOverlayManager
     private var blockedApps = emptySet<String>()
-    private val localData: LocalData by inject(LocalData::class.java)
+    private val sharedPrefs: SharedPrefs by inject(SharedPrefs::class.java)
     private val scriptRepo: ScriptRepo by inject(ScriptRepo::class.java)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
@@ -43,7 +44,7 @@ class MyAccessibilityService : AccessibilityService() {
 
             ACTION_SHARE_CURRENT_SCREEN -> {
                 if (!isRunning) {
-                    Lg.w(TAG, "Service not running, cannot share screen")
+                    MyLog.w(TAG, "Service not running, cannot share screen")
                 }
                 serviceScope.launch {
                     val screenAnalysis = ScreenAnalyser.analyzeScreen(
@@ -68,8 +69,8 @@ class MyAccessibilityService : AccessibilityService() {
             LockOverlayManager(this) // This seems redundant as overlayManager is already initialized.
 
         if (blockedApps.isEmpty() && isKeyguardSecure()) {
-            blockedApps = localData.blockedApps
-            Lg.d(TAG, "Loaded blocked apps: ")
+            blockedApps = sharedPrefs.blockedApps
+            MyLog.d(TAG, "Loaded blocked apps: ")
 
 
         }
@@ -105,7 +106,7 @@ class MyAccessibilityService : AccessibilityService() {
                 )
                 val currentPackage = analysisResult.pkg
                 if (checkBlockedApp(currentPackage)) {
-                    Lg.i(TAG, "Blocked app in use: $currentPackage")
+                    MyLog.i(TAG, "Blocked app in use: $currentPackage")
                     block(BlockReason.UsingBlockedApp(currentPackage ?: "unknown"))
                     return@launch
                 }
@@ -118,12 +119,12 @@ class MyAccessibilityService : AccessibilityService() {
                 Log.d(TAG, "Script evaluated in ${scriptEvalDuration.inWholeMilliseconds}ms")
                 when (scriptResult) {
                     is ScriptResult.Error -> {
-                        Lg.e(TAG, "Script evaluation error: ${scriptResult.error}")
+                        MyLog.e(TAG, "Script evaluation error: ${scriptResult.error}")
                     }
 
                     is ScriptResult.Success -> {
                         if (scriptResult.matched) {
-                            Lg.i(
+                            MyLog.i(
                                 TAG,
                                 "Blocking due to script match: ${scriptResult.scriptName} on ${analysisResult.pkg}"
                             )
@@ -178,7 +179,7 @@ class MyAccessibilityService : AccessibilityService() {
 
     override fun onInterrupt() {
         serviceScope.cancel()
-        Lg.w(TAG, "Service interrupted")
+        MyLog.w(TAG, "Service interrupted")
         isRunning = false
 
     }

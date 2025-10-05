@@ -5,15 +5,16 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import com.mafazaa.ainaa.AppActivity
-import com.mafazaa.ainaa.Constants
-import com.mafazaa.ainaa.Lg
-import com.mafazaa.ainaa.data.local.LocalData
-import com.mafazaa.ainaa.model.DnsProtectionLevel
+import com.mafazaa.ainaa.utils.Constants
+import com.mafazaa.ainaa.utils.MyLog
+import com.mafazaa.ainaa.data.local.SharedPrefs
+import com.mafazaa.ainaa.domain.models.DnsProtectionLevel
+import com.mafazaa.ainaa.helpers.MyNotificationManager
 import org.koin.java.KoinJavaComponent.inject
 
 class MyVpnService : VpnService() {
     private var vpnInterface: ParcelFileDescriptor? = null
-    private val localData: LocalData by inject(LocalData::class.java)
+    private val sharedPrefs: SharedPrefs by inject(SharedPrefs::class.java)
 
     companion object {
         private const val TAG = "MyVpnService"
@@ -35,7 +36,7 @@ class MyVpnService : VpnService() {
             }
 
             else -> {
-                val level = localData.dnsProtectionLevel
+                val level = sharedPrefs.dnsProtectionLevel
                 startVpn(level)
                 return START_STICKY
             }
@@ -61,12 +62,12 @@ class MyVpnService : VpnService() {
             setMtu(1500)
         }
 
-        Lg.d(TAG, "Starting VPN service with protection level: $dnsProtectionLevel")
+        MyLog.d(TAG, "Starting VPN service with protection level: $dnsProtectionLevel")
 
         vpnInterface?.close()
         vpnInterface = builder.establish()
         if (vpnInterface == null) {
-            Lg.e(TAG, "Failed to establish VPN interface")
+            MyLog.e(TAG, "Failed to establish VPN interface")
             stopSelf()
             return
         }
@@ -74,7 +75,7 @@ class MyVpnService : VpnService() {
     }
 
     private fun stopVpn() {
-        Lg.d(TAG, "Stopping VPN service")
+        MyLog.d(TAG, "Stopping VPN service")
         vpnInterface?.close()
         vpnInterface = null
         isRunning = false
@@ -85,7 +86,7 @@ class MyVpnService : VpnService() {
     override fun onDestroy() {
         super.onDestroy()//todo
         isRunning = false
-        Lg.d(TAG, "VPN service destroyed")
+        MyLog.d(TAG, "VPN service destroyed")
         if (isRunning) {
             // إعادة التشغيل التلقائي
             Intent(this, MyVpnService::class.java).apply {
@@ -98,7 +99,7 @@ class MyVpnService : VpnService() {
     override fun onRevoke() {
         super.onRevoke()//todo
         isRunning = false
-        Lg.d(TAG, "VPN revoked")
+        MyLog.d(TAG, "VPN revoked")
         Intent(this, MyVpnService::class.java).apply {
             action = ACTION_START
         }
