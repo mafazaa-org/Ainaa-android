@@ -1,10 +1,11 @@
 package com.mafazaa.ainaa.data.remote
 
 import android.util.Log
-import com.mafazaa.ainaa.Constants
-import com.mafazaa.ainaa.model.ReportDto
-import com.mafazaa.ainaa.model.VersionDto
-import com.mafazaa.ainaa.model.repo.RemoteRepo
+import com.mafazaa.ainaa.data.models.NetworkResult
+import com.mafazaa.ainaa.utils.Constants
+import com.mafazaa.ainaa.data.models.ReportModel
+import com.mafazaa.ainaa.data.models.VersionModel
+import com.mafazaa.ainaa.domain.repo.RemoteRepo
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.logging.LogLevel
@@ -50,7 +51,7 @@ class KtorRepo : RemoteRepo {
      * the 'v' prefix. e.g. v23 -> 23
      * 2. the apk asset in the release contains the `Constants.releaseApkName`
      */
-    override suspend fun getLatestVersion(): VersionDto? {
+    override suspend fun getLatestVersion(): VersionModel? {
         return try {
             val client = HttpClient(Android)
             val response: HttpResponse =
@@ -70,7 +71,7 @@ class KtorRepo : RemoteRepo {
                 downloadAsset?.get("browser_download_url")?.jsonPrimitive?.content.orEmpty()
             val size = downloadAsset?.get("size")?.jsonPrimitive?.longOrNull ?: 0L
             val version = tagName.removePrefix("v").toInt()
-            return VersionDto(version, name, downloadUrl, body, size)
+            return VersionModel(version, name, downloadUrl, body, size)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -104,16 +105,16 @@ class KtorRepo : RemoteRepo {
     }
 
 
-    override fun submitReportToGoogleForm(reportDto: ReportDto): Flow<NetworkResult> = flow {
+    override fun submitReportToGoogleForm(reportModel: ReportModel): Flow<NetworkResult> = flow {
         emit(NetworkResult.Loading)
         try {
             val response: HttpResponse = client.post(reportProblemFormUrl) {
                 contentType(ContentType.Application.FormUrlEncoded)
                 setBody(Parameters.build {
-                    append(reportNameEntryId, reportDto.name)
-                    append(reportPhoneNumberEntryId, reportDto.phone)
-                    append(reportEmailEntryId, reportDto.email)
-                    append(reportProblemEntryId, reportDto.problem)
+                    append(reportNameEntryId, reportModel.name)
+                    append(reportPhoneNumberEntryId, reportModel.phone)
+                    append(reportEmailEntryId, reportModel.email)
+                    append(reportProblemEntryId, reportModel.problem)
                 }.formUrlEncode())
             }
 
@@ -132,7 +133,7 @@ class KtorRepo : RemoteRepo {
 //useful for quick testing
 suspend fun main() {
     val repo = KtorRepo()
-    repo.submitReportToGoogleForm(ReportDto("f", "f", "f", "f")).collect {
+    repo.submitReportToGoogleForm(ReportModel("f", "f", "f", "f")).collect {
         println(it)
     }
 }

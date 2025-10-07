@@ -9,11 +9,13 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.mafazaa.ainaa.data.local.LocalData
+import com.mafazaa.ainaa.data.local.SharedPrefs
 import com.mafazaa.ainaa.di.appModule
-import com.mafazaa.ainaa.model.FileRepo
+import com.mafazaa.ainaa.domain.FileRepo
 import com.mafazaa.ainaa.receiver.BootReceiver
 import com.mafazaa.ainaa.service.DailyUpdateNotificationWorker
+import com.mafazaa.ainaa.utils.MyLog
+import com.mafazaa.ainaa.utils.isKeyguardSecure
 import org.koin.android.ext.android.getKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
@@ -28,23 +30,23 @@ class MyApp : Application() {
         }
 
         val fileRepo: FileRepo = getKoin().get()
-        Lg.fileRepo = fileRepo // set the file repo for logging
+        MyLog.fileRepo = fileRepo // set the file repo for logging
 
         if (!isKeyguardSecure()) {//if the device is not encrypted
-            val localData: LocalData = getKoin().get()
-            if (localData.lastVersion == 0) {//first run
+            val sharedPrefs: SharedPrefs = getKoin().get()
+            if (sharedPrefs.lastVersion == 0) {//first run
                 isFirstTime = true
-                Lg.i(TAG, "First run, initializing local data")
-                localData.lastVersion = BuildConfig.VERSION_CODE
-            } else if (localData.lastVersion < BuildConfig.VERSION_CODE) {// app updated
-                Lg.i(
+                MyLog.i(TAG, "First run, initializing local data")
+                sharedPrefs.lastVersion = BuildConfig.VERSION_CODE
+            } else if (sharedPrefs.lastVersion < BuildConfig.VERSION_CODE) {// app updated
+                MyLog.i(
                     TAG,
-                    "App updated from version ${localData.lastVersion} to ${BuildConfig.VERSION_CODE}"
+                    "App updated from version ${sharedPrefs.lastVersion} to ${BuildConfig.VERSION_CODE}"
                 )
-                localData.lastVersion = BuildConfig.VERSION_CODE
-                localData.downloadedVersion = 0// reset downloaded version
+                sharedPrefs.lastVersion = BuildConfig.VERSION_CODE
+                sharedPrefs.downloadedVersion = 0// reset downloaded version
             } else {
-                Lg.i(TAG, "App version is up to date: ${localData.lastVersion}")
+                MyLog.i(TAG, "App version is up to date: ${sharedPrefs.lastVersion}")
             }
         }
         registerBootReceiver()

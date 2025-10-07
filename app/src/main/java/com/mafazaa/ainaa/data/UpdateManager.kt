@@ -1,11 +1,11 @@
 package com.mafazaa.ainaa.data
 
-import com.mafazaa.ainaa.Lg
-import com.mafazaa.ainaa.data.local.LocalData
-import com.mafazaa.ainaa.model.FileRepo
-import com.mafazaa.ainaa.model.UpdateState
-import com.mafazaa.ainaa.model.repo.RemoteRepo
-import com.mafazaa.ainaa.model.repo.UpdateRepo
+import com.mafazaa.ainaa.utils.MyLog
+import com.mafazaa.ainaa.data.local.SharedPrefs
+import com.mafazaa.ainaa.domain.FileRepo
+import com.mafazaa.ainaa.domain.models.UpdateState
+import com.mafazaa.ainaa.domain.repo.RemoteRepo
+import com.mafazaa.ainaa.domain.repo.UpdateRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flowOn
 
 class UpdateManager(
     private val repo: RemoteRepo,
-    private val localData: LocalData,
+    private val sharedPrefs: SharedPrefs,
     private val fileProvider: FileRepo,
 ) : UpdateRepo {
 
@@ -31,7 +31,7 @@ class UpdateManager(
 
         if (remoteVersion == null) {
             emit(
-                if (localData.downloadedVersion > currentVersion) {
+                if (sharedPrefs.downloadedVersion > currentVersion) {
                     UpdateState.Downloaded
                 } else {
                     UpdateState.NoUpdate
@@ -40,7 +40,7 @@ class UpdateManager(
             return@flow
         }
 
-        if (localData.downloadedVersion >= remoteVersion.version) {
+        if (sharedPrefs.downloadedVersion >= remoteVersion.version) {
             emit(UpdateState.Downloaded)
             return@flow
         }
@@ -50,13 +50,13 @@ class UpdateManager(
             return@flow
         }
 
-        Lg.d(TAG, "Downloading update version ${remoteVersion.version}")
+        MyLog.d(TAG, "Downloading update version ${remoteVersion.version}")
         emit(UpdateState.Downloading)
         if (repo.downloadFile(remoteVersion.downloadUrl, updateFile)) {
-            localData.downloadedVersion = remoteVersion.version
+            sharedPrefs.downloadedVersion = remoteVersion.version
             emit(UpdateState.Downloaded)
         } else {
-            Lg.e(TAG, "Download failed")
+            MyLog.e(TAG, "Download failed")
             emit(UpdateState.Failed("Download failed"))
         }
     }.flowOn(Dispatchers.IO)

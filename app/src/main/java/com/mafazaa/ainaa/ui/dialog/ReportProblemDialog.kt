@@ -35,13 +35,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.mafazaa.ainaa.model.ReportDto
+import com.mafazaa.ainaa.data.models.ReportModel
 import com.mafazaa.ainaa.ui.theme.lightGray
 
 @Composable
 fun ReportProblemDialog(
     onClose: () -> Unit,
-    onSubmit: (ReportDto) -> Unit,
+    onSubmit: (ReportModel) -> Unit,
 ) {
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
@@ -153,7 +153,7 @@ fun ReportProblemDialog(
 
                 // Submit Button
                 Button(
-                    onClick = { onSubmit(ReportDto(name, phone, email, problem)) },
+                    onClick = { onSubmit(ReportModel(name, phone, email, problem)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp)
