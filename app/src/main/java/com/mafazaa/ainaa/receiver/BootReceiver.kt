@@ -1,42 +1,37 @@
 package com.mafazaa.ainaa.receiver
 
-import android.content.*
-import android.util.Log
-import androidx.core.content.*
-import com.mafazaa.ainaa.Lg
-import com.mafazaa.ainaa.data.*
-import com.mafazaa.ainaa.service.*
-import org.koin.java.KoinJavaComponent.inject
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import com.mafazaa.ainaa.utils.MyLog
+import com.mafazaa.ainaa.data.local.FakeFileRepo
+import com.mafazaa.ainaa.utils.hasAccessibilityPermission
+import com.mafazaa.ainaa.utils.hasVpnPermission
+import com.mafazaa.ainaa.utils.isKeyguardSecure
+import com.mafazaa.ainaa.service.MyAccessibilityService.Companion.startAccessibilityService
+import com.mafazaa.ainaa.utils.startVpnService
 
-class BootReceiver: BroadcastReceiver() {
-    val localData: LocalData by inject(LocalData::class.java)
+class BootReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != Intent.ACTION_BOOT_COMPLETED) {
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
+            intent.action != Intent.ACTION_LOCKED_BOOT_COMPLETED &&
+            intent.action != Intent.ACTION_REBOOT
+        ) {
             return
         }
-        if (localData.phoneNum.isNotBlank()&& !MyVpnService.isRunning) {//has vpn permission
-            Lg.i(TAG, "Starting vpn on boot")
-            ContextCompat.startForegroundService(
-                context,
-                Intent(
-                    context,
-                    MyVpnService::class.java
-                ).apply {
-                    action = MyVpnService.ACTION_START
-                }
-            )
-        }
 
-        if (localData.apps.isNotEmpty()){
-            Lg.i(TAG, "Starting daily notification worker on boot")
-            ContextCompat.startForegroundService(
-                context,
-                Intent(
-                    context,
-                    MonitorService::class.java
-                )
-            )
+        if (!context.isKeyguardSecure()) {
+            MyLog.fileRepo = FakeFileRepo
+            MyLog.w(TAG, "Device is not encrypted, logging disabled")
+        }
+        MyLog.i(TAG, "Device :${intent.action}")
+        if (context.hasAccessibilityPermission()) {
+            context.startAccessibilityService()
+        }
+        if (context.hasVpnPermission()) {
+            MyLog.i(TAG, "Starting vpn on boot")
+            context.startVpnService()
         }
 
     }

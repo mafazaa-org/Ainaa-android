@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     id("kotlinx-serialization")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -22,7 +24,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            isShrinkResources = true
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -87,7 +89,13 @@ dependencies {
 
 // WorkManager
     implementation("androidx.work:work-runtime-ktx:2.10.3")
-
+    //js engine
+    implementation("org.mozilla:rhino:1.7.14")
+    //gson
+    implementation("com.google.code.gson:gson:2.10.1")
+    //
+    implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
+    implementation("com.google.firebase:firebase-crashlytics")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
